@@ -241,16 +241,23 @@ class Dashboard extends CI_Controller
 
 				echo "<script type='text/javascript'>alert('File berhasil terkirim ke ftp');";
 				echo "window.location.href='" . site_url(ucfirst('approval/dashboard/approve')) . "';</script>";
+				$data = array(
+					'nip_approval' => $this->session->userdata('nip'),
+					'approve' => '4'
+				);
+				$this->m_input->updateData($key, $data);
+
+				$update = array(
+					'nip_approval' => $this->session->userdata('nip'),
+					'file_proses' => $filename,
+					'time_proses' => date('Y-m-d H:i:s')
+				);
+				$this->db->insert('tbl_log_file', $update);
 			} else {
 				echo "<script type='text/javascript'>alert('File sudah pernah diproses');";
 				echo "window.location.href='" . site_url(ucfirst('approval/dashboard/approve')) . "';</script>";
 			}
 
-			$data = array(
-				'nip_approval' => $this->session->userdata('nip'),
-				'approve' => '4'
-			);
-			$this->m_input->updateData($key, $data);
 			$this->ftp->close();
 		}
 	}
@@ -260,29 +267,35 @@ class Dashboard extends CI_Controller
 		$filename = $this->session->userdata('filename');
 		$no_fos = substr($filename, 31, 10);
 
-		if (!empty($filename) && !empty($no_fos)) {
-			// connect and login to FTP server
-			$ftp_server = $this->config->item('ftp_host_srv');
-			$ftp_username = $this->config->item('ftp_user_srv');
-			$ftp_userpass = $this->config->item('ftp_pass_srv');
+		// if (!empty($filename) && !empty($no_fos)) {
+		// connect and login to FTP server
+		$ftp_server = $this->config->item('ftp_host_srv');
+		$ftp_username = $this->config->item('ftp_user_srv');
+		$ftp_userpass = $this->config->item('ftp_pass_srv');
 
-			$ftp_conn = ftp_connect($ftp_server) or die("Could not connect to $ftp_server");
-			$login = ftp_login($ftp_conn, $ftp_username, $ftp_userpass);
+		$ftp_conn = ftp_connect($ftp_server) or die("Could not connect to $ftp_server");
+		ftp_login($ftp_conn, $ftp_username, $ftp_userpass);
 
-			$local_file = "./result_txt/" . $filename;
-			$server_file = './PROSES/OUT/MMC/' . $filename;
-
+		$get_file = $this->db->get_where('tbl_log_file', ['nip_approval' => $this->session->userdata('nip')]);
+		foreach ($get_file->result_array() as $file) {
+			$local_file = "./result_txt/" . $file['file_proses'];
+			$server_file = './PROSES/OUT/MMC/' . $file['file_proses'];
 			// download server file
 			$upload = ftp_get($ftp_conn, $local_file, $server_file, FTP_BINARY);
-			if (!$upload) {
-				$this->session->set_flashdata('Proses', 'File sedang di proses...');
-			} else {
-				$this->send_mail();
-			}
 
-			// close connection
-			ftp_close($ftp_conn);
+			if (!$upload) {
+				$this->session->set_flashdata('Proses', $get_file->num_rows().' File sedang di proses...');
+			} else {
+				$get_file = $this->db->get_where('tbl_result', ['file_name' => $file['file_proses']]);
+				if ($get_file->num_rows() > 0) {
+					$this->send_mail();
+				}
+			}
 		}
+
+		// close connection
+		ftp_close($ftp_conn);
+		// }
 	}
 
 	// Send email sukses
