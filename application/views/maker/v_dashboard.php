@@ -175,7 +175,6 @@
                                 <th>Nomor CIF</th>
                                 <th>Rek. Nasabah</th>
                                 <th>Nom. Fasilitas (Rp)</th>
-                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -192,11 +191,6 @@
                                     <td><?= $row['cif'] ?></td>
                                     <td><?= $row['rek_nsbh'] ?></td>
                                     <td class="text-right"><?= number_format($row['nom_fasilitas'], 0, '.', ',') ?></td>
-                                    <td class="text-center">
-                                        <a href="<?= site_url(ucfirst('maker/dashboard/print/' . $row['no_fos'])) ?>" title="Print" target="_blank">
-                                            <i class="fa fa-fw fa-print"></i>
-                                        </a>
-                                    </td>
                                 </tr>
                             <?php } ?>
                         </tbody>
