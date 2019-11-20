@@ -293,10 +293,11 @@
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group">
-												<label class="control-label col-md-4">% Pricing</label>
-												<div class="col-md-4">
+												<label class="control-label col-md-4">% Margin</label>
+												<div class="col-md-3">
 													<input type="text" name="margin" id="margin" class="form-control" placeholder="Ex. 15.00">
 												</div>
+												<p class="control-label text-muted">(Rate Bank + Fee Agent)</p>
 											</div>
 										</div>
 										<!-- <div class="col-md-6">
