@@ -15,9 +15,9 @@ class Dashboard extends CI_Controller
 			redirect('login');
 		}
 
-		if (!empty($this->session->userdata('filename'))) {
+		// if (!empty($this->session->userdata('filename'))) {
 			$this->getResult();
-		}
+		// }
 	}
 
 	function index()
@@ -264,8 +264,8 @@ class Dashboard extends CI_Controller
 
 	function getResult()
 	{
-		$filename = $this->session->userdata('filename');
-		$no_fos = substr($filename, 31, 10);
+		// $filename = $this->session->userdata('filename');
+		// $no_fos = substr($filename, 31, 10);
 
 		// if (!empty($filename) && !empty($no_fos)) {
 		// connect and login to FTP server
@@ -276,15 +276,14 @@ class Dashboard extends CI_Controller
 		$ftp_conn = ftp_connect($ftp_server) or die("Could not connect to $ftp_server");
 		ftp_login($ftp_conn, $ftp_username, $ftp_userpass);
 
-		$get_file = $this->db->get_where('tbl_log_file', ['nip_approval' => $this->session->userdata('nip')]);
+		$get_file = $this->db->get_where('tbl_log_file', ['nip_approval' => $this->session->userdata('nip'), 'time_proses' => date('Y-m-d')]);
 		foreach ($get_file->result_array() as $file) {
 			$local_file = "./result_txt/" . $file['file_proses'];
 			$server_file = './PROSES/OUT/MMC/' . $file['file_proses'];
 			// download server file
 			$upload = ftp_get($ftp_conn, $local_file, $server_file, FTP_BINARY);
-
-			if (!$upload) {
-				$this->session->set_flashdata('Proses', $get_file->num_rows().' File sedang di proses...');
+			if ($upload === false) {
+				$this->session->set_flashdata('Proses', $get_file->num_rows() . ' File sedang di proses...');
 			} else {
 				$get_file = $this->db->get_where('tbl_result', ['file_name' => $file['file_proses']]);
 				if ($get_file->num_rows() > 0) {
@@ -516,5 +515,482 @@ class Dashboard extends CI_Controller
 				}
 			}
 		}
+	}
+
+	// print detail pembiayaan nasabah
+	function print($id)
+	{
+		$this->load->library('pdf');
+		global $title;
+		$fpdf = new PDF('P');
+		$title = 'Detail Data Pembiayaan Nasabah';
+		$fpdf->SetTitle($title);
+		$fpdf->AliasNbPages();
+
+		// page break
+		$fpdf->AddPage();
+		// load data
+		$this->db->select('*')->from('tbl_input a');
+		$this->db->join('tbl_induk b', 'b.no_fos = a.no_fos', 'inner');
+		$this->db->join('tbl_anak c', 'c.no_fos = a.no_fos', 'inner');
+		$this->db->join('tbl_link d', 'd.no_fos = a.no_fos', 'inner');
+		$this->db->join('tbl_jaminan e', 'e.no_fos = a.no_fos', 'inner');
+		$this->db->join('tbl_asset f', 'f.no_fos = a.no_fos', 'inner');
+		$this->db->join('tbl_koperasi g', 'g.cif_induk = a.cif_induk', 'inner');
+		$this->db->join('tbl_kontrak h', 'h.no_fos = a.no_fos', 'inner');
+		$this->db->join('tbl_cabang i', 'i.kd_cabang = a.kode_cabang', 'inner');
+		$this->db->where('a.no_fos', $id);
+		$result = $this->db->get();
+		// load data
+
+		foreach ($result->result_array() as $res) {
+			$fpdf->SetFont('Times', '', 10);
+			$fpdf->Cell(30, 6, 'U.p.:Yth. RFO Head/AFO Manager/BFO Manager.', 0, 1);
+			$fpdf->SetFont('Times', 'B', 10);
+			$fpdf->Cell(30, 6, 'Perihal : Pencairan a/n ' . $res['nama_nsbh'], 0, 0);
+			$fpdf->SetFont('Times', 'I', 10);
+			$fpdf->Ln(10);
+			$fpdf->Cell(30, 6, 'Assalamu`alaikum Warahmatullahi Wabarakatuh.', 0, 1);
+			$fpdf->SetFont('Times', '', 10);
+			$bln = array(1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember');
+			$tgl_akad = explode('-', $res['tgl_akad']);
+			$tgl_pks = explode('-', $res['tgl_pks']);
+			$fpdf->Cell(30, 6, 'Sehubungan dengan telah ditandatanganinya akad pembiayaan tanggal ' . $tgl_akad[2] . ' ' . $bln[$tgl_akad[1]] . ' ' . $tgl_akad[0] . ' dan surat nasabah ', 0, 1);
+			$fpdf->Cell(30, 6, $res['nama_nsbh'] . ' No. ' . $res['no_pks'] . ' tanngal ' . $tgl_pks[2] . ' ' . $bln[$tgl_pks[1]] . ' ' . $tgl_pks[0] . ' agar dilakukan pencairan kepada', 0, 1);
+			$fpdf->Cell(30, 6, 'nasabah tersebut. Untuk kebutuhan itu, kami lampirkan data nasabah dan data jaminan pembiayaan/collateral maintenance.', 0, 0);
+			$fpdf->Ln(10);
+
+			// echo data nasabah
+			$fpdf->SetFont('Times', '', 10);
+			$fpdf->Cell(30, 6, 'Nama Cabang', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['nama_cabang'], 0, 0);
+			$fpdf->Cell(30, 6, 'Usulan Tgl. Cair', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(35, 6, '20' . substr($res['no_fos'], 0, 2) . '-' . substr($res['no_fos'], 2, 2) . '-' . substr($res['no_fos'], 4, 2), 0, 1);
+			$fpdf->Cell(30, 6, 'Nomor CIF', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['cif'], 0, 0);
+			$fpdf->Cell(30, 6, 'Member Koperasi', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(30, 6, $res['nip_member_kop'], 0, 1);
+			$fpdf->Cell(30, 6, 'Nama Nasabah', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['nama_nsbh'], 0, 0);
+			$fpdf->Cell(30, 6, 'Nama Koperasi', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(30, 6, $res['nama_kop'], 0, 0);
+			$fpdf->Ln(10);
+			// echo data nasabah
+
+			// Fasilitas Induk
+			$fpdf->SetFont('Times', 'B', 10);
+			$fpdf->Cell(30, 6, 'Fasilitas Induk', 0, 1);
+			$fpdf->SetFont('Times', '', 10);
+			$fpdf->Cell(30, 6, 'Mata Uang', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['mata_uang'], 0, 0);
+			$fpdf->Cell(30, 6, 'Segmentasi Kriteria', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['segmen'] == 13 ? $res['segmen'] . ' - Pembiayaan Konsumer' : '', 0, 1);
+			$fpdf->Cell(30, 6, 'Nominal Fasilitas', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, 'Rp. ' . number_format($res['nom_fasilitas'], 0, '.', ','), 0, 0);
+			$fpdf->Cell(30, 6, 'Rating Internal', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['rating_int'], 0, 1);
+			$fpdf->Cell(30, 6, 'Maks. Penggunaan', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, 'Rp. ' . number_format($res['nom_max_guna'], 0, '.', ','), 0, 0);
+			$fpdf->Cell(30, 6, 'Rating Eksternal', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['rating_eks'] . ' - Tidak ada rating', 0, 1);
+			$fpdf->Cell(30, 6, 'Tanggal Nota', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tgl_nota'], 0, 1);
+			$fpdf->Cell(30, 6, 'Tanggal SP3', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tgl_sp3'], 0, 1);
+			$fpdf->Cell(30, 6, 'Tgl. Jatuh Tempo', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tgl_jth_tempo'], 0, 0);
+			$fpdf->Ln(10);
+			// Fasilitas Induk
+
+			// Fasilitas Anak
+			$fpdf->SetFont('Times', 'B', 10);
+			$fpdf->Cell(30, 6, 'Fasilitas Anak', 0, 1);
+			$fpdf->SetFont('Times', '', 10);
+			$fpdf->Cell(30, 6, 'Golongan Piutang', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['gol_piutang'] == 19 ? $res['gol_piutang'] . ' - Pembiayaan Konsumer' : $res['gol_piutang'], 0, 0);
+			$fpdf->Cell(30, 6, 'Mata Uang', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['mata_uang'], 0, 1);
+			$lok = $this->db->get_where('tbl_lokasi', ['id' => $res['lokasi_proyek']])->row_array();
+			$fpdf->Cell(30, 6, 'Lokasi Proyek', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $lok['id'] . ' - ' . $lok['deskripsi'], 0, 0);
+			$fpdf->Cell(30, 6, 'Nominal Fasilitas', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, 'Rp. ' . number_format($res['nom_fasilitas'], 0, '.', ','), 0, 1);
+			$fpdf->Cell(30, 6, 'Jenis Penggunaan', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['jenis_guna'] == 89 ? $res['jenis_guna'] . ' - Kredit Konsumsi Lainnya' : $res['jenis_guna'], 0, 0);
+			$fpdf->Cell(30, 6, 'Maks. Penggunaan', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, 'Rp. ' . number_format($res['nom_max_guna'], 0, '.', ','), 0, 1);
+			$fpdf->Cell(30, 6, 'Sifat Pinjaman', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['sifat_pinjam'] == 60 ? $res['sifat_pinjam'] . ' - Piutang Murabahah' : $res['sifat_pinjam'], 0, 1);
+			$fpdf->Cell(30, 6, 'Tipe Penggunaan', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tipe_guna'] == 3 ? $res['tipe_guna'] . ' - Konsumsi' : $res['tipe_guna'], 0, 1);
+			$sek = $this->db->get_where('tbl_sektor', ['id' => $res['sektor_ekonomi']])->row_array();
+			$fpdf->Cell(30, 6, 'Sektor Ekonomi', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $sek['id'] . ' - ' . $sek['deskripsi'], 0, 1);
+			$fpdf->Cell(30, 6, 'Baru/Perpanjangan', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			if ($res['status_cair'] == 0) {
+				$fpdf->Cell(70, 6, $res['status_cair'] . ' - Baru', 0, 0);
+			} else {
+				for ($i = 1; $i <= 5; $i++) {
+					if ($res['status_cair'] == $i) {
+						$fpdf->Cell(70, 6, $res['status_cair'] . ' - Perpanjangan ke-' . $i, 0, 0);
+					}
+				}
+			}
+			$fpdf->Ln(10);
+			// Fasilitas Anak
+
+			// Pendaftaran Link Jaminan
+			$fpdf->SetFont('Times', 'B', 10);
+			$fpdf->Cell(30, 6, 'Pendaftaran Link Jaminan', 0, 1);
+			$fpdf->SetFont('Times', '', 10);
+			$fpdf->Cell(30, 6, 'Kode Jaminan', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['kode_jaminan'] == 10 ? $res['kode_jaminan'] . ' - Lainnya' : $res['kode_jaminan'], 0, 1);
+			$fpdf->Cell(30, 6, 'CIF Nasabah', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['cif'], 0, 1);
+			$fpdf->Cell(30, 6, 'Nama Nasabah', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['nama_nsbh'], 0, 1);
+			$fpdf->Cell(30, 6, 'CIF Induk', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['cif_induk'], 0, 1);
+			$fpdf->Cell(30, 6, 'Nama Koperasi', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['nama_kop'], 0, 1);
+			$fpdf->Cell(30, 6, 'Tgl. Jatuh Tempo', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tgl_jth_tempo'], 0, 0);
+			$fpdf->Ln(10);
+			// Pendaftaran Link Jaminan
+
+			// Pendaftaran Nilai Jaminan
+			$fpdf->SetFont('Times', 'B', 10);
+			$fpdf->Cell(30, 6, 'Pendaftaran Nilai Jaminan', 0, 1);
+			$fpdf->SetFont('Times', '', 10);
+			$fpdf->Cell(30, 6, 'Tipe Jaminan', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tipe_jaminan'] == 82 ? $res['tipe_jaminan'] . ' - Salary Slip' : $res['tipe_jaminan'], 0, 1);
+			$fpdf->Cell(30, 6, 'Kode Jaminan', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['kode_jaminan'] == 10 ? $res['kode_jaminan'] . ' - Lainnya' : $res['kode_jaminan'], 0, 1);
+			$fpdf->Cell(30, 6, 'Deskripsi', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['deskripsi'], 0, 1);
+			$fpdf->Cell(30, 6, 'Mata Uang', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['mata_uang'], 0, 1);
+			$fpdf->Cell(30, 6, 'Negara', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['negara'] . ' - INDONESIA', 0, 1);
+			$fpdf->Cell(30, 6, 'Tanggal Taksasi', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, '20' . substr($res['no_fos'], 0, 2) . '-' . substr($res['no_fos'], 2, 2) . '-' . substr($res['no_fos'], 4, 2), 0, 1);
+			$fpdf->Cell(30, 6, 'Nilai Pasar', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, 'Rp. ' . number_format($res['nom_fasilitas'], 0, '.', ','), 0, 1);
+			$fpdf->Cell(30, 6, 'Nilai Likuidasi', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, 'Rp. ' . number_format($res['nom_fasilitas'], 0, '.', ','), 0, 1);
+			$fpdf->Cell(30, 6, 'Nilai NJOP', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, 'Rp. ' . number_format($res['njop'], 0, '.', ','), 0, 1);
+			$fpdf->Cell(30, 6, 'Surat/Bukti ', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['surat_bukti'], 0, 1);
+			$fpdf->Cell(30, 6, 'Kepemilikan', 0, 0);
+			$fpdf->Ln(10);
+			// Pendaftaran Nilai Jaminan
+
+			// Pendaftaran Aset Murabahah
+			$fpdf->SetFont('Times', 'B', 10);
+			$fpdf->Cell(30, 6, 'Pendaftaran Aset Murabahah', 0, 1);
+			$fpdf->SetFont('Times', '', 10);
+			$fpdf->Cell(30, 6, 'Nama Aset', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['nama_asset'], 0, 0);
+			$fpdf->Cell(30, 6, 'Harga Aset', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, 'Rp. ' . number_format($res['harga_asset'], 0, '.', ','), 0, 1);
+			$fpdf->Cell(30, 6, 'Keterangan Aset', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['ket_asset'], 0, 0);
+			$fpdf->Cell(30, 6, 'Uang Muka', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, 'Rp. ' . number_format($res['uang_muka'], 0, '.', ','), 0, 1);
+			$fpdf->Cell(30, 6, 'Mata Uang', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['mata_uang'], 0, 0);
+			$fpdf->Cell(30, 6, 'Jumlah Aset', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['jumlah_asset'] . ' Unit', 0, 1);
+			$fpdf->Cell(30, 6, 'Nomor CIF', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['cif'], 0, 0);
+			$fpdf->Cell(30, 6, 'Total Aset', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, 'Rp. ' . number_format($res['total_asset'], 0, '.', ','), 0, 1);
+			$fpdf->Cell(30, 6, 'CIF Pemasok', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['cif_pemasok'], 0, 1);
+			$fpdf->Cell(30, 6, 'Nama Pemasok', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['nama_pemasok'], 0, 1);
+			$fpdf->Cell(30, 6, 'Rekening Pemasok', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['rek_pemasok'], 0, 0);
+			$fpdf->Ln(10);
+			// Pendaftaran Aset Murabahah
+
+			// Pendaftaran Agent
+			$fpdf->SetFont('Times', 'B', 10);
+			$fpdf->Cell(30, 6, 'Pendaftaran Agent', 0, 1);
+			$fpdf->SetFont('Times', '', 10);
+			$fpdf->Cell(30, 6, 'CIF Induk', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['cif_induk'], 0, 1);
+			$fpdf->Cell(30, 6, 'Nama Koperasi', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['nama_kop'], 0, 1);
+			$fpdf->Cell(30, 6, 'Rekening Agent', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['rek_agent'], 0, 1);
+			$fpdf->Cell(30, 6, 'Rekening Escrow', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['rek_escrow'], 0, 1);
+			$fpdf->Cell(30, 6, 'Tenor Bank', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$exp = explode('::', $res['tenor_bank']);
+			if (count($exp) < 1) {
+				$fpdf->Cell(70, 6, $exp[0] . ' Bulan', 0, 1);
+			} else {
+				$fpdf->Cell(70, 6, $exp[0] . ' Bulan', 0, 1);
+				for ($i = 1; $i < count($exp); $i++) {
+					$fpdf->Cell(35, 6, '', 0, 0);
+					$fpdf->Cell(70, 6, $exp[$i] . ' Bulan', 0, 1);
+				}
+			}
+			$fpdf->Cell(30, 6, 'Rate Bank', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$exp = explode('::', $res['rate_bank']);
+			if (count($exp) < 1) {
+				$fpdf->Cell(70, 6, $exp[0] . ' %', 0, 1);
+			} else {
+				$fpdf->Cell(70, 6, $exp[0] . ' %', 0, 1);
+				for ($i = 1; $i < count($exp); $i++) {
+					$fpdf->Cell(35, 6, '', 0, 0);
+					$fpdf->Cell(70, 6, $exp[$i] . ' %', 0, 1);
+				}
+			}
+			$fpdf->Cell(30, 6, 'Nomor PKS', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['no_pks'], 0, 1);
+			$fpdf->Cell(30, 6, 'Nomor SKKP', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['no_skkp'], 0, 1);
+			$fpdf->Cell(30, 6, 'Tgl. Keputusan', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tgl_komite'], 0, 1);
+			$fpdf->Cell(30, 6, 'Komite', 0, 1);
+			$fpdf->Cell(30, 6, 'Tanggal Expire', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tgl_expired'], 0, 0);
+			$fpdf->Ln(10);
+			// Pendaftaran Agent
+
+			// Kontrak Pembiayaan
+			$fpdf->SetFont('Times', 'B', 10);
+			$fpdf->Cell(30, 6, 'Kontrak Pembiayaan', 0, 1);
+			$fpdf->SetFont('Times', '', 10);
+			$fpdf->Cell(30, 6, 'Tanggal Angsuran', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, strlen($res['tgl_angsuran']) > 1 ? $res['tgl_angsuran'] : '0' . $res['tgl_angsuran'], 0, 0);
+			$fpdf->Cell(30, 6, 'Penanda Wakalah', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['wakalah'], 0, 1);
+			$fpdf->Cell(30, 6, 'Mata Uang', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['mata_uang'], 0, 0);
+			$fpdf->Cell(30, 6, 'Tipe Margin', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tipe_margin'] == 1 ? $res['tipe_margin'] . ' - Margin Single' : $res['tipe_margin'], 0, 1);
+			$fpdf->Cell(30, 6, 'Nilai Maksimal', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, 'Rp. ' . number_format($res['nom_max_guna'], 0, '.', ','), 0, 0);
+			$fpdf->Cell(30, 6, 'Margin', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['margin'] . ' %', 0, 1);
+			$fpdf->Cell(105, 6, 'Pembiayaan', 0, 0);
+			$fpdf->Cell(105, 6, '(Rate Bank + Fee Agent)', 0, 1);
+			$fpdf->Cell(30, 6, 'Tenor', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tenor'] . ' Bulan', 0, 1);
+			$fpdf->Cell(30, 6, 'Kode Unit Kerja', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['kode_unit_kerja'] . ' - BBG B2B', 0, 0);
+			$fpdf->Cell(30, 6, 'Biaya Teratribusi', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['teratribusi'], 0, 1);
+			$fpdf->Cell(30, 6, 'Tipe Produk', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tipe_produk'], 0, 0);
+			$fpdf->Cell(30, 6, 'Rekening Biaya', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['rek_biaya'], 0, 1);
+			$fpdf->Cell(30, 6, 'Kode Biaya', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$exp_kode = explode('::', $res['kode_biaya']);
+			$exp_biaya = explode('::', $res['nom_biaya']);
+			$biaya = array(
+				'FINAPP' => 'Biaya Penilaian',
+				'FINDIS' => 'Biaya Pencairan Murabahah',
+				'FININS' => 'Biaya Asuransi',
+				'FINNTRY' => 'Biaya Notaris',
+				'FINOTH' => 'Biaya Lain-lain',
+				'FINSMTP' => 'Biaya Materai'
+			);
+			if (count($exp_kode) < 1) {
+				foreach ($biaya as $key => $val) {
+					if ($exp_kode[0] == $key) {
+						$fpdf->Cell(70, 6, $key . ' - ' . $val, 0, 0);
+						$fpdf->Cell(30, 6, 'Nilai Biaya', 0, 0);
+						$fpdf->Cell(5, 6, ':', 0, 0);
+						$fpdf->Cell(70, 6, 'Rp. ' . number_format($exp_biaya[0], 0, '', ','), 0, 1);
+					}
+				}
+			} else {
+				foreach ($biaya as $key => $val) {
+					if ($exp_kode[0] == $key) {
+						$fpdf->Cell(70, 6, $key . ' - ' . $val, 0, 0);
+						$fpdf->Cell(30, 6, 'Nilai Biaya', 0, 0);
+						$fpdf->Cell(5, 6, ':', 0, 0);
+						$fpdf->Cell(70, 6, 'Rp. ' . number_format($exp_biaya[0], 0, '', ','), 0, 1);
+					}
+
+					for ($i = 1; $i < count($exp_kode); $i++) {
+						if ($exp_kode[$i] == $key) {
+							$fpdf->Cell(35, 6, '', 0, 0);
+							$fpdf->Cell(70, 6, $key . ' - ' . $val, 0, 0);
+							$fpdf->Cell(35, 6, '', 0, 0);
+							$fpdf->Cell(70, 6, 'Rp. ' . number_format($exp_biaya[$i], 0, '', ','), 0, 1);
+						}
+					}
+				}
+			}
+			$fpdf->Cell(30, 6, 'Kode AO Kepala', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['kode_pim'], 0, 0);
+			$fpdf->Cell(30, 6, 'Status Piutang', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['status_piutang'] == 20 ? $res['status_piutang'] . ' - Bkn Dlm Restrukturisasi' : $res['status_piutang'], 0, 1);
+			$fpdf->Cell(30, 6, 'Cabang', 0, 1);
+			$fpdf->Cell(30, 6, 'Kode AO Risk', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['kode_fao'], 0, 0);
+			$fpdf->Cell(30, 6, 'Orientasi Penggunaan', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['orientasi'] == 9 ? $res['orientasi'] . ' - Lainnya' : $res['orientasi'] . ' - Ekspor', 0, 1);
+			$fpdf->Cell(30, 6, 'Officer', 0, 1);
+			$fpdf->Cell(30, 6, 'Kode AO Marketing', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['kode_ao'], 0, 0);
+			$fpdf->Cell(30, 6, 'Sifat Piutang', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['sifat_piutang'] == 1 ? $res['sifat_piutang'] . ' - Dengan Akad' : $res['sifat_piutang'] . ' - Tanpa Akad', 0, 1);
+			$segmen = array(
+				'CONS' => 'Konsumer (Konsumtif)',
+				'INV' => 'Investasi (Produktif)',
+				'WCAP' => 'Modal Kerja (Produktif)'
+			);
+			$fpdf->Cell(30, 6, 'Segmentasi Produk', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			foreach ($segmen as $key => $val) {
+				if ($res['segmentasi'] == $key) {
+					$fpdf->Cell(70, 6, $key . ' - ' . $val, 0, 0);
+				}
+			}
+			$fpdf->Cell(30, 6, 'Tipe Angsuran', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tipe_angsuran'] == 1 ? $res['tipe_angsuran'] . ' - Efektif Tetap' : $res['tipe_angsuran'], 0, 1);
+			$fpdf->Cell(30, 6, 'Rekening Agent', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['rek_agent'], 0, 0);
+			$fpdf->Cell(30, 6, 'Nomor Akad', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['no_akad'], 0, 1);
+			$fpdf->Cell(30, 6, 'Rekening Nasabah', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['rek_nsbh'], 0, 0);
+			$fpdf->Cell(30, 6, 'Tanggal Akad', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['tgl_akad'], 0, 1);
+			$fpdf->Cell(30, 6, 'Rekening Pokok', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['rek_pokok'], 0, 1);
+			$fpdf->Cell(30, 6, 'Rekening Margin', 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(70, 6, $res['rek_margin'], 0, 0);
+			$fpdf->Ln(10);
+			// Kontrak Pembiayaan
+			$fpdf->SetFont('Times', '', 10);
+			$fpdf->Cell(30, 6, 'Demikian atas perhatian dan bantuan Saudara, kami ucapkan terima kasih.', 0, 1);
+			$fpdf->SetFont('Times', 'I', 10);
+			$fpdf->Cell(30, 6, 'Wassalamu`alaikum Warahmatullahi Wabarakatuh', 0, 0);
+			$fpdf->Ln(10);
+			$fpdf->SetFont('Times', 'B', 10);
+			$fpdf->Cell(30, 6, 'PT BANK SYARIAH MANDIRI', 0, 1);
+			$fpdf->Cell(30, 6, $res['nama_cabang'], 0, 0);
+			$fpdf->Ln(10);
+		}
+
+		// echo data user
+		$fpdf->SetFont('Times', '', 10);
+
+		$qry = $this->db->get_where('tbl_input', ['no_fos' => $id])->row_array();
+		$n = array($qry['nip_user'], $qry['nip_checker'], $qry['nip_reviewer'], $qry['nip_approval']);
+
+		$this->db->select('akses_user, nama_user, jabatan')->from('tbl_users a');
+		$this->db->join('tbl_cabang b', 'a.cabang = b.kd_cabang', 'inner');
+		foreach ($n as $n) {
+			$this->db->or_where('a.nip_user', $n);
+		}
+		$users = $this->db->get()->result_array();
+		foreach ($users as $user) {
+			$fpdf->Cell(20, 6, $user['akses_user'], 0, 0);
+			$fpdf->Cell(5, 6, ':', 0, 0);
+			$fpdf->Cell(30, 6, $user['nama_user'] . ' / ' . $user['jabatan'], 0, 1);
+		}
+		// echo data user
+		$fpdf->SetFont('Times', 'I', 10);
+		$fpdf->Cell(30, 6, '*) Dengan ini kami menyatakan sebenar-benarnya bahwa data pada Aplikasi ini sesuai dengan dokumen yang ada dan dapat', 0, 1);
+		$fpdf->Cell(30, 6, 'dipertanggung jawabkan.', 0, 1);
+
+		// give the name file
+		$fpdf->Output('I', 'CF-' . $res['nama_nsbh'] . '-20' . substr($res['no_fos'], 0, 6) . '.pdf');
 	}
 }
