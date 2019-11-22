@@ -1,9 +1,9 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
 // Config database
-$config['hostname'] = 'localhost'; // devel2.bsm.co.id
-$config['username'] = 'root'; // bbg
-$config['password'] = ''; // BBG1234
+$config['hostname'] = 'devel2.bsm.co.id'; // devel2.bsm.co.id
+$config['username'] = 'bbg'; // bbg
+$config['password'] = 'BBG1234'; // BBG1234
 $config['database'] = 'bbg'; // bbg
 
 // Config ftp local
