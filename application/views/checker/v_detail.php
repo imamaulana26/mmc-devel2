@@ -1,5 +1,5 @@
-<form method="post" action="<?= site_url(ucfirst('checker/dashboard/updateDetail')) ?>">
-    <?php foreach ($details->result() as $dt) { ?>
+<?php foreach ($details->result() as $dt) { ?>
+    <form method="post" action="<?= site_url(ucfirst('checker/dashboard/updateDetail')) ?>">
         <div class="modal fade" id="detail<?= $dt->no_fos ?>" tabindex="-1" dialog="role" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -127,7 +127,7 @@
                                                         <label>Maksimal Penggunaan</label>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <p>Rp. <?= number_format($dt->nom_max_guna, 0, '.', ',') ?></p>
+                                                        <p>Rp. <?= number_format($dt->sisa_nom, 0, '.', ',') ?></p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -275,7 +275,7 @@
                                                         <label>Maksimal Penggunaan</label>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <p>Rp. <?= number_format($dt->nom_max_guna, 0, '.', ',') ?></p>
+                                                        <p>Rp. <?= number_format($dt->sisa_nom, 0, '.', ',') ?></p>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -1055,7 +1055,7 @@
                                                         <label>Nilai Maksimal Pembiayaan</label>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <p>Rp. <?= number_format($dt->nom_max_guna, 0, '.', ',') ?></p>
+                                                        <p>Rp. <?= number_format($dt->sisa_nom, 0, '.', ',') ?></p>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -1325,10 +1325,10 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="submit" name="reject" value="0" class="btn btn-default">
+                                    <button type="submit" name="reject" class="btn btn-default">
                                         Revisi <i class="fa fa-fw fa-edit"></i>
                                     </button>
-                                    <button type="submit" name="approve" value="2" class="btn btn-default">
+                                    <button type="submit" name="approve" class="btn btn-default">
                                         Approved <i class="fa fa-fw fa-check-square-o"></i>
                                     </button>
                                 </div>
@@ -1339,5 +1339,5 @@
                 </div>
             </div>
         </div>
-    <?php } ?>
-</form>
+    </form>
+<?php } ?>

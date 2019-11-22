@@ -6,8 +6,9 @@ class M_input extends CI_Model{
 	}
 
 	function getData($key){
+		$this->db->select('*')->from('tbl_input a')->join('tbl_koperasi b', 'a.cif_induk = b.cif_induk', 'inner');
 		$this->db->where('no_fos', $key);
-		$result = $this->db->get('tbl_input');
+		$result = $this->db->get();
 		return $result;
 	}
 	

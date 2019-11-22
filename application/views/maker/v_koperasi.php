@@ -41,6 +41,7 @@
 								<th>Nama Cabang</th>
 								<th>Rek. Agent</th>
 								<th>Rek. Escrow</th>
+								<th>Nominal Awal (Rp)</th>
 								<th>Nom. Tersedia (Rp)</th>
 								<th>Tenor Bank</th>
 								<th>Rate Agent</th>
@@ -61,6 +62,7 @@
 									<td><?= $dt->rek_agent ?></td>
 									<td><?= $dt->rek_escrow ?></td>
 									<td class="text-right"><?= number_format($dt->nominal, 0, '.', ',') ?></td>
+									<td class="text-right"><?= number_format($dt->sisa_nom, 0, '.', ',') ?></td>
 									<td><?php
 											$exp = explode("::", $dt->tenor_bank);
 											for ($i = 0; $i < count($exp); $i++) {
@@ -74,7 +76,7 @@
 											}
 											?></td>
 									<td><?= $dt->id_fasilitas ?></td>
-									<?php if ($akses != 'Checker') { ?>
+									<?php if ($akses == 'Maker' || $akses == 'Reviewer') { ?>
 										<td class="text-center">
 											<a href="<?= site_url(ucfirst('maker/koperasi/edit_koperasi/')) . $dt->cif_induk ?>">
 												<i class="glyphicon glyphicon-edit" title="Ubah Data"></i>

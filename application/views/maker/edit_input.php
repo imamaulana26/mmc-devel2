@@ -175,9 +175,10 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label col-md-4">Tanggal Angsuran</label>
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <input type="text" name="tgl_angsuran" id="tgl_angsuran" class="form-control" value="<?= $row->tgl_angsuran ?>" readonly>
                                         </div>
+                                        <p class="text-muted">*) Tgl. angsuran sesuai tgl. jatuh tempo</p>
                                     </div>
                                 </div>
                             </div>
@@ -419,6 +420,7 @@
         document.getElementById('rek_pokok').value = dtKop[nama_kop].rek;
         $('h5').html("<i class='text-muted'>" + $('#nama_kop').val() + "</i>");
         document.getElementById("checkbox").checked = false;
+        $('#formValid').bootstrapValidator('updateStatus', 'rek_pokok', 'NOT_VALIDATED');
     };
 
     function toggleCheckbox() {
@@ -429,5 +431,6 @@
             changeValue($('#nama_kop').val());
             $('h5').html("<i class='text-muted'>" + $('#nama_kop').val() + "</i>");
         }
+        $('#formValid').bootstrapValidator('updateStatus', 'rek_pokok', 'NOT_VALIDATED');
     }
 </script>

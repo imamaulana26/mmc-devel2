@@ -160,7 +160,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">
-                        Data Pembiayaan Existing
+                        History Data Entry
                     </h3>
                 </div>
                 <div class="panel-body">
@@ -209,8 +209,8 @@
     $(document).ready(function() {
         $('#tbl_input, #tbl_eksisting').DataTable({
             'ordering': false,
-            'scrollY': 200,
-            'scrollX': true
+			'scrollY': 200,
+			'scrollX': true
         });
     });
 </script>

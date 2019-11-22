@@ -89,9 +89,11 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="control-label col-md-4">Rekening Debet Angsuran</label>
+                                    <label class="control-label col-md-4">Rekening Debet Angsuran 
+                                        <i class="fa fa-fw fa-question-circle" style="color: #337ab7" data-toggle="tooltip" title="Rek. Agent / Rek. Escrow / Rek. Nasabah"></i>
+                                    </label>
                                     <div class="col-md-4">
-                                        <input type="text" name="rek_pokok" id="rek_pokok" class="form-control" readonly>
+                                        <input type="text" name="rek_pokok" id="rek_pokok" class="form-control">
                                         <input type="checkbox" name="checkbox" id="checkbox" value="Y" onclick="toggleCheckbox();"><i class="text-muted"> Rekening Nasabah</i>
                                     </div>
                                     <h5><i class="text-muted"></i></h5>
@@ -111,7 +113,7 @@
                                                     if ($cab['kd_cabang'] == $li->cabang) {
                                                         $select = 'selected';
                                                     }
-                                                    echo "<option value='" . $cab['kd_cabang'] . "' ".$select.">" . $cab['nama_cabang'] . "</option>";
+                                                    echo "<option value='" . $cab['kd_cabang'] . "' " . $select . ">" . $cab['nama_cabang'] . "</option>";
                                                 }
                                             } ?>
                                         </select>
@@ -164,7 +166,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="control-label col-md-4">Tanggal Angsuran</label>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <input type="text" name="tgl_angsuran" id="tgl_angsuran" class="form-control" readonly>
                                     </div>
                                     <p class="text-muted">*) Tgl. angsuran sesuai tgl. jatuh tempo</p>
@@ -398,7 +400,8 @@
 <?php $this->load->view('layout/_footer'); ?>
 
 <script type="text/javascript">
-    $(document).ready(function(){
+    $(document).ready(function() {
+        $('[data-toggle="tooltip"]').tooltip(); 
         $('.selectpicker').selectpicker('refresh');
     });
 
@@ -413,6 +416,7 @@
         document.getElementById('rek_pokok').value = dtKop[nama_kop].rek;
         $('h5').html("<i class='text-muted'>" + $('#nama_kop').val() + "</i>");
         document.getElementById("checkbox").checked = false;
+        $('#formValid').bootstrapValidator('updateStatus', 'rek_pokok', 'NOT_VALIDATED');
     }
 
     function toggleCheckbox() {
@@ -423,5 +427,6 @@
             changeValue($('#nama_kop').val());
             $('h5').html("<i class='text-muted'>" + $('#nama_kop').val() + "</i>");
         }
+        $('#formValid').bootstrapValidator('updateStatus', 'rek_pokok', 'NOT_VALIDATED');
     }
 </script>

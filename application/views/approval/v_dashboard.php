@@ -178,7 +178,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading" style="cursor: pointer">
                     <h3 class="panel-title">
-                        Data Pembiayaan Existing
+                        History Data Entry
                     </h3>
                 </div>
                 <div class="panel-body">
@@ -193,7 +193,9 @@
                                 <th>Nomor CIF</th>
                                 <th>Rek. Nasabah</th>
                                 <th>Nom. Fasilitas (Rp)</th>
-                                <th class="text-center">Aksi</th>
+                                <?php if ($this->session->userdata('akses_user') == 'Approval') { ?>
+                                    <th class="text-center">Aksi</th>
+                                <?php } ?>
                             </tr>
                         </thead>
                         <tbody>
@@ -210,11 +212,17 @@
                                     <td><?= $row->cif ?></td>
                                     <td><?= $row->rek_nsbh ?></td>
                                     <td class="text-right"><?= number_format($row->nom_fasilitas, 0, '.', ',') ?></td>
-                                    <td class="text-center">
-                                        <a href="<?= site_url(ucfirst('approval/dashboard/print/' . $row->no_fos)) ?>" title="Print" target="_blank">
-                                            <i class="fa fa-fw fa-print"></i>
-                                        </a>
-                                    </td>
+                                    <?php if ($this->session->userdata('akses_user') == 'Approval') { ?>
+                                        <td class="text-center">
+                                            <?php if ($row->nip_approval != '') { ?>
+                                                <a href="<?= site_url(ucfirst('approval/dashboard/print/' . $row->no_fos)) ?>" title="Print" target="_blank">
+                                                    <i class="fa fa-fw fa-print"></i>
+                                                </a>
+                                            <?php } else { ?>
+                                                <i class="fa fa-fw fa-minus"></i>
+                                            <?php } ?>
+                                        </td>
+                                    <?php } ?>
                                 </tr>
                             <?php } ?>
                         </tbody>

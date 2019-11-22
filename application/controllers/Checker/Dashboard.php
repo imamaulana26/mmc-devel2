@@ -77,7 +77,7 @@ class Dashboard extends CI_Controller
 
 	function updateDetail()
 	{
-		$key = input($this->input->post('no_fos'));
+		$key = $this->input->post('no_fos');
 
 		date_default_timezone_set('Asia/Jakarta');
 		$log = array(
@@ -94,22 +94,28 @@ class Dashboard extends CI_Controller
 			$update = array(
 				'no_fos' => $key,
 				'nip_checker' => $this->session->userdata('nip'),
-				'approve' => $this->input->post('approve')
+				'approve' => 2
 			);
 			$log['detail'] = $key . ' disetujui oleh ' . $this->session->userdata('nip');
 			$this->session->set_flashdata('Info', 'Data ' . $key . ' telah disetujui dan dikirim ke menu Reviewer');
+			
+			$this->m_input->updateData($key, $update);
+			$this->m_log->insert($log);
+			redirect(site_url(ucfirst('checker/dashboard')));
+			$this->session->unset_userdata('Info');
 		} else {
 			$update = array(
 				'no_fos' => $key,
 				'nip_checker' => $this->session->userdata('nip'),
-				'approve' => $this->input->post('reject')
+				'approve' => 0
 			);
 			$log['detail'] = $key . ' ditolak oleh ' . $this->session->userdata('nip');
 			$this->session->set_flashdata('Info', 'Data ' . $key . ' telah ditolak dan dikirim ke menu Maker');
+			
+			$this->m_input->updateData($key, $update);
+			$this->m_log->insert($log);
+			redirect(site_url(ucfirst('checker/dashboard')));
+			$this->session->unset_userdata('Info');
 		}
-
-		$this->m_input->updateData($key, $update);
-		$this->m_log->insert($log);
-		redirect(site_url(ucfirst('checker/dashboard')));
 	}
 }

@@ -14,10 +14,6 @@ class Dashboard extends CI_Controller
 			$this->session->sess_destroy();
 			redirect('login');
 		}
-
-		// if (!empty($this->session->userdata('filename'))) {
-			$this->getResult();
-		// }
 	}
 
 	function index()
@@ -63,6 +59,7 @@ class Dashboard extends CI_Controller
 	// approve / reject
 	function approve()
 	{
+		$this->getResult();
 		$key = input($this->input->post('no_fos'));
 
 		$data = array(
@@ -264,10 +261,6 @@ class Dashboard extends CI_Controller
 
 	function getResult()
 	{
-		// $filename = $this->session->userdata('filename');
-		// $no_fos = substr($filename, 31, 10);
-
-		// if (!empty($filename) && !empty($no_fos)) {
 		// connect and login to FTP server
 		$ftp_server = $this->config->item('ftp_host_srv');
 		$ftp_username = $this->config->item('ftp_user_srv');
@@ -277,244 +270,245 @@ class Dashboard extends CI_Controller
 		ftp_login($ftp_conn, $ftp_username, $ftp_userpass);
 
 		$get_file = $this->db->get_where('tbl_log_file', ['nip_approval' => $this->session->userdata('nip'), 'time_proses' => date('Y-m-d')]);
-		foreach ($get_file->result_array() as $file) {
-			$local_file = "./result_txt/" . $file['file_proses'];
-			$server_file = './PROSES/OUT/MMC/' . $file['file_proses'];
+		$count = $get_file->num_rows();
+
+		foreach ($get_file->result_array() as $get_file) {
+			$local_file = "./result_txt/" . $get_file['file_proses'];
+			$server_file = './PROSES/OUT/MMC/' . $get_file['file_proses'];
 			// download server file
 			$upload = ftp_get($ftp_conn, $local_file, $server_file, FTP_BINARY);
-			if ($upload === false) {
-				$this->session->set_flashdata('Proses', $get_file->num_rows() . ' File sedang di proses...');
+			if (!$upload) {
+				$this->session->set_flashdata('Proses', $count . ' file sedang di proses...');
 			} else {
-				$get_file = $this->db->get_where('tbl_result', ['file_name' => $file['file_proses']]);
-				if ($get_file->num_rows() > 0) {
-					$this->send_mail();
+				$get_res = $this->db->get_where('tbl_result', ['file_name' => $get_file['file_proses']]);
+				// jika file_proses belum ada di tbl_result maka kirim email
+				if ($get_res->num_rows() < 1) {
+					// Send email
+					$this->load->library('email');
+
+					$config = array(
+						'mailtype' => 'html',
+						'protocol' => 'mail',
+						'smtp_host' => 'webmail.syariahmandiri.co.id',
+						'smtp_user' => 'adminmmc@syariahmandiri.co.id',
+						'smtp_pass' => 'Bsm123',
+						'smtp_port' => 25,
+						'newline' => "\r\n"
+					);
+					$this->email->initialize($config);
+
+					if (file_exists('./result_txt/' . $get_file['file_proses'])) {	// cek apakah file sudah ada di directory atau belum
+						$file = file_get_contents('./result_txt/' . $get_file['file_proses']);
+
+						$hasil = strstr(substr(trim($file), 0, -1), 'SUKSES|LD');
+						$res = strstr($hasil, 'LD');
+
+						if (!empty($res)) {
+							date_default_timezone_set('Asia/Jakarta');
+							$data = array(
+								'file_name' => $get_file['file_proses'],
+								'cabang' => substr($get_file['file_proses'], 13, 9),
+								'time_upload' => date('Y-m-d H:i:s'),
+								'status' => 'Sukses',
+								'no_fos' => substr($get_file['file_proses'], 31, 10),
+								'no_loan' => $res
+							);
+
+							$log = array(
+								'user_session' => $this->session->userdata('nip'),
+								'nama_user' => $this->session->userdata('nama_user'),
+								'akses_user' => $this->session->userdata('akses_user'),
+								'ip_address' => $_SERVER['REMOTE_ADDR'],
+								'browser' => $_SERVER['HTTP_USER_AGENT'],
+								'url' => $_SERVER['REQUEST_URI'],
+								'waktu' => date('Y-m-d H:i:s'),
+								'detail' => 'Pencairan ' . $data['file_name'] . ' sukses dengan NOLOAN ' . $data['no_loan']
+							);
+
+							$isi = ['status' => 'Sukses'];
+							$this->m_input->updateData($data['no_fos'], $isi);
+
+							// cek apakah nama file sudah ada atau belum
+							$this->db->select('*')->from('tbl_input a');
+							$this->db->join('tbl_cabang b', 'b.kd_cabang = a.kode_cabang', 'inner');
+							$this->db->where(['a.status' => 'Sukses', 'a.no_fos' => $data['no_fos']]);
+							$dt_mail = $this->db->get()->row_array();
+
+							$this->db->insert('tbl_result', $data);
+							$this->m_log->insert($log);
+
+							// kirim email notifikasi
+							// isi pesan
+							$msg = "<strong><i>Assalamu'alaikum Warahmatullahi Wabarakatuh</i></strong><br><br>";
+							$msg .= "<p>Berikut hasil proses pencairan dengan menggunakan Aplikasi MMC <br><br>";
+							$msg .= "<table>";
+							$msg .= "<tr>";
+							$msg .= "<td>No. Aplikasi</td>";
+							$msg .= "<td>:</td>";
+							$msg .= "<td>" . $dt_mail['no_fos'] . "</td>";
+							$msg .= "</tr>";
+							$msg .= "<tr>";
+							$msg .= "<td>Nama Koperasi</td>";
+							$msg .= "<td>:</td>";
+							$msg .= "<td>" . $dt_mail['nama_kop'] . "</td>";
+							$msg .= "</tr>";
+							$msg .= "<tr>";
+							$msg .= "<td>Nama Nasabah</td>";
+							$msg .= "<td>:</td>";
+							$msg .= "<td>" . $dt_mail['nama_nsbh'] . "</td>";
+							$msg .= "</tr>";
+							$msg .= "<tr>";
+							$msg .= "<td>Nama Cabang</td>";
+							$msg .= "<td>:</td>";
+							$msg .= "<td>" . $dt_mail['nama_cabang'] . "</td>";
+							$msg .= "</tr>";
+							$msg .= "<tr>";
+							$msg .= "<td>Nominal Pencairan</td>";
+							$msg .= "<td>:</td>";
+							$msg .= "<td>Rp. " . number_format($dt_mail['nom_fasilitas'], 0, '', ',') . "</td>";
+							$msg .= "</tr>";
+							$msg .= "</table>";
+							$msg .= "telah berhasil diproses pada " . $data['time_upload'] . " dengan NOLOAN : " . $data['no_loan'] . ".</p><br><br>";
+							$msg .= "<strong><i>Wassalamu'alaikum Warahmatullahi Wabarakatuh</i></strong><br>";
+							$msg .= "<i>*) Harap tidak membalas pesan ini.</i>";
+
+							// update sisa nominal pada koperasi
+							$this->db->update('tbl_koperasi', ['sisa_nom' => 'nominal' - $dt_mail['nom_fasilitas']], ['cif_induk' => $dt_mail['cif_induk']]);
+
+							// kirim email ke user maker, checker, reviewer, approval
+							$this->db->select('*')->from('tbl_input')->where('no_fos', $data['no_fos']);
+							$query = $this->db->get();
+							$result = $query->result();
+
+							$mail = "";
+							foreach ($result as $res) {
+								$this->db->select('*')->from('tbl_users');
+								$nip = array($res->nip_checker, $res->nip_user, $res->nip_reviewer, $res->nip_approval);
+								foreach ($nip as $n) {
+									$this->db->or_where('nip_user', $n);
+								}
+								$result = $this->db->get();
+
+								foreach ($result->result() as $dt) {
+									$mail .= $dt->email . ', ';
+								}
+							}
+
+							$this->email->to(str_replace('syariahmandiri', 'bsm', substr($mail, 0, -2)));
+							// $this->email->to('adminmmc@bsm.co.id');
+							$this->email->from('no-reply@bsm.co.id', 'Multiposting Murabahah Chanelling');
+							$this->email->subject('Pencairan ' . $res->nama_kop . ' Kepada ' . $res->nama_nsbh . ' Berhasil!');
+							$this->email->message($msg);
+
+							if ($this->email->send()) {
+								$this->session->set_flashdata('Email', $count . ' hasil proses berhasil dikirim ke email');
+								$this->session->unset_userdata('Proses');
+							}
+						} else {
+							date_default_timezone_set('Asia/Jakarta');
+							$data = array(
+								'file_name' => $get_file['file_proses'],
+								'cabang' => substr($get_file['file_proses'], 13, 9),
+								'time_upload' => date('Y-m-d H:i:s'),
+								'status' => 'Gagal',
+								'no_fos' => substr($get_file['file_proses'], 31, 10)
+							);
+
+							$log = array(
+								'user_session' => $this->session->userdata('nip'),
+								'nama_user' => $this->session->userdata('nama_user'),
+								'akses_user' => $this->session->userdata('akses_user'),
+								'ip_address' => $_SERVER['REMOTE_ADDR'],
+								'browser' => $_SERVER['HTTP_USER_AGENT'],
+								'url' => $_SERVER['REQUEST_URI'],
+								'waktu' => date('Y-m-d H:i:s'),
+								'detail' => 'Pencairan ' . $data['file_name'] . ' gagal'
+							);
+
+							$isi = ['status' => 'Gagal'];
+							$this->m_input->updateData($data['no_fos'], $isi);
+
+							// cek apakah nama file sudah ada atau belum
+							$this->db->select('*')->from('tbl_input a');
+							$this->db->join('tbl_cabang b', 'b.kd_cabang = a.kode_cabang', 'inner');
+							$this->db->where(['a.status' => 'Gagal', 'a.no_fos' => $data['no_fos']]);
+							$dt_mail = $this->db->get()->row_array();
+
+							$this->db->insert('tbl_result', $data);
+							$this->m_log->insert($log);
+
+							// kirim email notifikasi
+							// isi pesan
+							$msg = "<strong><i>Assalamu'alaikum Warahmatullahi Wabarakatuh</i></strong><br><br>";
+							$msg .= "<p>Berikut hasil proses pencairan dengan menggunakan Aplikasi MMC <br><br>";
+							$msg .= "<table>";
+							$msg .= "<tr>";
+							$msg .= "<td>No. Aplikasi</td>";
+							$msg .= "<td>:</td>";
+							$msg .= "<td>" . $dt_mail['no_fos'] . "</td>";
+							$msg .= "</tr>";
+							$msg .= "<tr>";
+							$msg .= "<td>Nama Koperasi</td>";
+							$msg .= "<td>:</td>";
+							$msg .= "<td>" . $dt_mail['nama_kop'] . "</td>";
+							$msg .= "</tr>";
+							$msg .= "<tr>";
+							$msg .= "<td>Nama Nasabah</td>";
+							$msg .= "<td>:</td>";
+							$msg .= "<td>" . $dt_mail['nama_nsbh'] . "</td>";
+							$msg .= "</tr>";
+							$msg .= "<tr>";
+							$msg .= "<td>Nama Cabang</td>";
+							$msg .= "<td>:</td>";
+							$msg .= "<td>" . $dt_mail['nama_cabang'] . "</td>";
+							$msg .= "</tr>";
+							$msg .= "<tr>";
+							$msg .= "<td>Nominal Pencairan</td>";
+							$msg .= "<td>:</td>";
+							$msg .= "<td>Rp. " . number_format($dt_mail['nom_fasilitas'], 0, '', ',') . "</td>";
+							$msg .= "</tr>";
+							$msg .= "</table>";
+							$msg .= "telah gagal diproses pada " . $data['time_upload'] . " mohon periksa lagi saat kelengkapan / pengisian data.</p><br><br>";
+							$msg .= "<strong><i>Wassalamu'alaikum Warahmatullahi Wabarakatuh</i></strong><br>";
+							$msg .= "<i>*) Harap tidak membalas pesan ini.</i>";
+
+							// kirim email ke user maker, checker, reviewer, approval
+							$this->db->select('*')->from('tbl_input')->where('no_fos', $data['no_fos']);
+							$query = $this->db->get();
+							$result = $query->result();
+
+							$mail = "";
+							foreach ($result as $res) {
+								$this->db->select('*')->from('tbl_users');
+								$nip = array($res->nip_checker, $res->nip_user, $res->nip_reviewer, $res->nip_approval);
+								foreach ($nip as $n) {
+									$this->db->or_where('nip_user', $n);
+								}
+								$result = $this->db->get();
+
+								foreach ($result->result() as $dt) {
+									$mail .= $dt->email . ', ';
+								}
+							}
+
+							$this->email->to(str_replace('syariahmandiri', 'bsm', substr($mail, 0, -2)));
+							// $this->email->to('adminmmc@bsm.co.id');
+							$this->email->from('no-reply@bsm.co.id', 'Multiposting Murabahah Chanelling');
+							$this->email->subject('Pencairan ' . $res->nama_kop . ' Kepada ' . $res->nama_nsbh . ' Gagal!');
+							$this->email->message($msg);
+
+							if ($this->email->send()) {
+								$this->session->set_flashdata('Email', $count . ' hasil proses berhasil dikirim ke email');
+								$this->session->unset_userdata('Proses');
+							}
+						}
+					}
 				}
 			}
 		}
 
 		// close connection
 		ftp_close($ftp_conn);
-		// }
-	}
-
-	// Send email sukses
-	function send_mail()
-	{
-		$this->load->library('email');
-		$filename = $this->session->userdata('filename');
-
-		$config = array(
-			'mailtype' => 'html',
-			'protocol' => 'mail',
-			'smtp_host' => 'webmail.syariahmandiri.co.id',
-			'smtp_user' => 'adminmmc@syariahmandiri.co.id',
-			'smtp_pass' => 'Bsm123',
-			'smtp_port' => 25,
-			'newline' => "\r\n"
-		);
-		$this->email->initialize($config);
-
-		if (file_exists('./result_txt/' . $filename)) {	// cek apakah file sudah ada di directory atau belum
-			$file = file_get_contents('./result_txt/' . $filename);
-
-			$hasil = strstr(substr(trim($file), 0, -1), 'SUKSES|LD');
-			$res = strstr($hasil, 'LD');
-
-			if (!empty($res)) {
-				date_default_timezone_set('Asia/Jakarta');
-				$data = array(
-					'file_name' => $filename,
-					'cabang' => substr($filename, 13, 9),
-					'time_upload' => date('Y-m-d H:i:s'),
-					'status' => 'Sukses',
-					'no_fos' => substr($filename, 31, 10),
-					'no_loan' => $res
-				);
-
-				$log = array(
-					'user_session' => $this->session->userdata('nip'),
-					'nama_user' => $this->session->userdata('nama_user'),
-					'akses_user' => $this->session->userdata('akses_user'),
-					'ip_address' => $_SERVER['REMOTE_ADDR'],
-					'browser' => $_SERVER['HTTP_USER_AGENT'],
-					'url' => $_SERVER['REQUEST_URI'],
-					'waktu' => date('Y-m-d H:i:s'),
-					'detail' => 'Pencairan ' . $data['file_name'] . ' sukses dengan NOLOAN ' . $data['no_loan']
-				);
-
-				$isi = ['status' => 'Sukses'];
-
-				// cek apakah nama file sudah ada atau belum
-				$this->db->select('*')->from('tbl_input a');
-				$this->db->join('tbl_cabang b', 'b.kd_cabang = a.kode_cabang', 'inner');
-				$this->db->where(['a.status' => 'Sukses', 'a.no_fos' => $data['no_fos']]);
-				$dt_mail = $this->db->get()->result();
-
-				$this->db->insert('tbl_result', $data);
-				$this->m_log->insert($log);
-				$this->m_input->updateData($data['no_fos'], $isi);
-
-				// kirim email notifikasi
-				// isi pesan
-				$msg = "<strong><i>Assalamu'alaikum Warahmatullahi Wabarakatuh</i></strong><br><br>";
-				$msg .= "<p>Berikut hasil proses pencairan dengan menggunakan Aplikasi MMC <br><br>";
-				$msg .= "<table>";
-				$msg .= "<tr>";
-				$msg .= "<td>No. Aplikasi</td>";
-				$msg .= "<td>:</td>";
-				$msg .= "<td>" . $dt_mail[0]->no_fos . "</td>";
-				$msg .= "</tr>";
-				$msg .= "<tr>";
-				$msg .= "<td>Nama Koperasi</td>";
-				$msg .= "<td>:</td>";
-				$msg .= "<td>" . $dt_mail[0]->nama_kop . "</td>";
-				$msg .= "</tr>";
-				$msg .= "<tr>";
-				$msg .= "<td>Nama Nasabah</td>";
-				$msg .= "<td>:</td>";
-				$msg .= "<td>" . $dt_mail[0]->nama_nsbh . "</td>";
-				$msg .= "</tr>";
-				$msg .= "<tr>";
-				$msg .= "<td>Nama Cabang</td>";
-				$msg .= "<td>:</td>";
-				$msg .= "<td>" . $dt_mail[0]->nama_cabang . "</td>";
-				$msg .= "</tr>";
-				$msg .= "<tr>";
-				$msg .= "<td>Nominal Pencairan</td>";
-				$msg .= "<td>:</td>";
-				$msg .= "<td>Rp. " . number_format($dt_mail[0]->nom_fasilitas, 0, '', ',') . "</td>";
-				$msg .= "</tr>";
-				$msg .= "</table>";
-				$msg .= "telah berhasil diproses pada " . $data['time_upload'] . " dengan NOLOAN : " . $data['no_loan'] . ".</p><br><br>";
-				$msg .= "<strong><i>Wassalamu'alaikum Warahmatullahi Wabarakatuh</i></strong><br>";
-				$msg .= "<i>*) Harap tidak membalas pesan ini.</i>";
-
-				// kirim email ke user maker, checker, reviewer, approval
-				$this->db->select('*')->from('tbl_input')->where('no_fos', $data['no_fos']);
-				$query = $this->db->get();
-				$result = $query->result();
-
-				$mail = "";
-				foreach ($result as $res) {
-					$this->db->select('*')->from('tbl_users');
-					$nip = array($res->nip_checker, $res->nip_user, $res->nip_reviewer, $res->nip_approval);
-					foreach ($nip as $n) {
-						$this->db->or_where('nip_user', $n);
-					}
-					$result = $this->db->get();
-
-					foreach ($result->result() as $dt) {
-						$mail .= $dt->email . ', ';
-					}
-				}
-
-				$this->email->to(str_replace('syariahmandiri', 'bsm', substr($mail, 0, -2)));
-				$this->email->from('no-reply@bsm.co.id', 'Multiposting Murabahah Chanelling');
-				$this->email->subject('Pencairan ' . $res->nama_kop . ' Kepada ' . $res->nama_nsbh . ' Berhasil!');
-				$this->email->message($msg);
-
-				if ($this->email->send()) {
-					$this->session->set_flashdata('Email', 'Hasil proses berhasil dikirim ke email');
-					$this->session->unset_userdata('filename');
-				}
-			} else {
-				date_default_timezone_set('Asia/Jakarta');
-				$data = array(
-					'file_name' => $filename,
-					'cabang' => substr($filename, 13, 9),
-					'time_upload' => date('Y-m-d H:i:s'),
-					'status' => 'Gagal',
-					'no_fos' => substr($filename, 31, 10)
-				);
-
-				$log = array(
-					'user_session' => $this->session->userdata('nip'),
-					'nama_user' => $this->session->userdata('nama_user'),
-					'akses_user' => $this->session->userdata('akses_user'),
-					'ip_address' => $_SERVER['REMOTE_ADDR'],
-					'browser' => $_SERVER['HTTP_USER_AGENT'],
-					'url' => $_SERVER['REQUEST_URI'],
-					'waktu' => date('Y-m-d H:i:s'),
-					'detail' => 'Pencairan ' . $data['file_name'] . ' gagal'
-				);
-
-				$isi = ['status' => 'Gagal'];
-
-				// cek apakah nama file sudah ada atau belum
-				$this->db->select('*')->from('tbl_input a');
-				$this->db->join('tbl_cabang b', 'b.kd_cabang = a.kode_cabang', 'inner');
-				$this->db->where(['a.status' => 'Gagal', 'a.no_fos' => $data['no_fos']]);
-				$dt_mail = $this->db->get()->result();
-
-				$this->db->insert('tbl_result', $data);
-				$this->m_log->insert($log);
-				$this->m_input->updateData($data['no_fos'], $isi);
-
-				// kirim email notifikasi
-				// isi pesan
-				$msg = "<strong><i>Assalamu'alaikum Warahmatullahi Wabarakatuh</i></strong><br><br>";
-				$msg .= "<p>Berikut hasil proses pencairan dengan menggunakan Aplikasi MMC <br><br>";
-				$msg .= "<table>";
-				$msg .= "<tr>";
-				$msg .= "<td>No. Aplikasi</td>";
-				$msg .= "<td>:</td>";
-				$msg .= "<td>" . $dt_mail[0]->no_fos . "</td>";
-				$msg .= "</tr>";
-				$msg .= "<tr>";
-				$msg .= "<td>Nama Koperasi</td>";
-				$msg .= "<td>:</td>";
-				$msg .= "<td>" . $dt_mail[0]->nama_kop . "</td>";
-				$msg .= "</tr>";
-				$msg .= "<tr>";
-				$msg .= "<td>Nama Nasabah</td>";
-				$msg .= "<td>:</td>";
-				$msg .= "<td>" . $dt_mail[0]->nama_nsbh . "</td>";
-				$msg .= "</tr>";
-				$msg .= "<tr>";
-				$msg .= "<td>Nama Cabang</td>";
-				$msg .= "<td>:</td>";
-				$msg .= "<td>" . $dt_mail[0]->nama_cabang . "</td>";
-				$msg .= "</tr>";
-				$msg .= "<tr>";
-				$msg .= "<td>Nominal Pencairan</td>";
-				$msg .= "<td>:</td>";
-				$msg .= "<td>Rp. " . number_format($dt_mail[0]->nom_fasilitas, 0, '', ',') . "</td>";
-				$msg .= "</tr>";
-				$msg .= "</table>";
-				$msg .= "telah gagal diproses pada " . $data['time_upload'] . " mohon periksa lagi saat kelengkapan / pengisian data.</p><br><br>";
-				$msg .= "<strong><i>Wassalamu'alaikum Warahmatullahi Wabarakatuh</i></strong><br>";
-				$msg .= "<i>*) Harap tidak membalas pesan ini.</i>";
-
-				// kirim email ke user maker, checker, reviewer, approval
-				$this->db->select('*')->from('tbl_input')->where('no_fos', $data['no_fos']);
-				$query = $this->db->get();
-				$result = $query->result();
-
-				$mail = "";
-				foreach ($result as $res) {
-					$this->db->select('*')->from('tbl_users');
-					$nip = array($res->nip_checker, $res->nip_user, $res->nip_reviewer, $res->nip_approval);
-					foreach ($nip as $n) {
-						$this->db->or_where('nip_user', $n);
-					}
-					$result = $this->db->get();
-
-					foreach ($result->result() as $dt) {
-						$mail .= $dt->email . ', ';
-					}
-				}
-
-				$this->email->to(str_replace('syariahmandiri', 'bsm', substr($mail, 0, -2)));
-				$this->email->from('no-reply@bsm.co.id', 'Multiposting Murabahah Chanelling');
-				$this->email->subject('Pencairan ' . $res->nama_kop . ' Kepada ' . $res->nama_nsbh . ' Gagal!');
-				$this->email->message($msg);
-
-				if ($this->email->send()) {
-					$this->session->set_flashdata('Email', 'Hasil proses berhasil dikirim ke email');
-					$this->session->unset_userdata('filename');
-				}
-			}
-		}
 	}
 
 	// print detail pembiayaan nasabah
@@ -987,8 +981,9 @@ class Dashboard extends CI_Controller
 		}
 		// echo data user
 		$fpdf->SetFont('Times', 'I', 10);
-		$fpdf->Cell(30, 6, '*) Dengan ini kami menyatakan sebenar-benarnya bahwa data pada Aplikasi ini sesuai dengan dokumen yang ada dan dapat', 0, 1);
+		$fpdf->Cell(30, 6, '*) Dengan ini kami menyatakan sebenar-benarnya bahwa data pada aplikasi ini sesuai dengan dokumen yang ada dan dapat', 0, 1);
 		$fpdf->Cell(30, 6, 'dipertanggung jawabkan.', 0, 1);
+		$fpdf->Cell(30, 6, '**) Print out ini tidak memerlukan paraf dan atau tanda tangan basah', 0, 1);
 
 		// give the name file
 		$fpdf->Output('I', 'CF-' . $res['nama_nsbh'] . '-20' . substr($res['no_fos'], 0, 6) . '.pdf');

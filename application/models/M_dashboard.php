@@ -75,7 +75,7 @@ class M_dashboard extends CI_Model
 		$this->db->join('tbl_cabang', 'tbl_cabang.kd_cabang = tbl_input.kode_cabang', 'inner');
 
 		if($akses == 'Reviewer'){
-			$this->db->where(['tbl_input.tgl_cair' => '0000-00-00', 'tbl_koperasi.id_fasilitas !=' => '']);
+			$this->db->where(['tbl_input.tgl_cair' => '0000-00-00', 'tbl_koperasi.id_fasilitas !=' => '', 'tbl_input.approve >' => '1']);
 		} else {
 			$this->db->where(['tbl_input.approve' => '3']);
 		}

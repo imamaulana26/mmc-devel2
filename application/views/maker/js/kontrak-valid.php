@@ -133,7 +133,8 @@
 							regexp: numb
 						},
 						stringLength: {
-							max: 10
+							min: 8,
+							max: 15
 						}
 					}
 				},

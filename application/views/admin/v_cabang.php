@@ -28,9 +28,6 @@
             <a href="<?= site_url(ucfirst('admin/cabang/add_cabang')) ?>" class="btn btn-primary" style="margin-bottom: 10px">
                 <i class="fa fa-fw fa-plus"></i> Daftar Cabang
             </a>
-            <a href="<?= site_url(ucfirst('admin/cabang/print_cabang')) ?>" target="_blank" class="btn btn-primary" style="margin-bottom: 10px">
-                <i class="fa fa-fw fa-file-pdf-o"></i> Export PDF
-            </a>
             <div class="panel panel-default">
                 <div class="panel-body">
                     <table class="table table-bordered table-hover" id="tbl_cabang">

@@ -57,9 +57,9 @@
 								</div>
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="control-label col-md-4">Nominal Fasilitas</label>
+										<label class="control-label col-md-4">Maksimal Penggunaan</label>
 										<div class="col-md-6">
-											<input type="text" class="form-control" value="<?= number_format($row->nom_fasilitas, 0, '.', ',') ?>" readonly>
+											<input type="text" class="form-control" name="maks_guna" id="maks_guna" value="<?= number_format($row->sisa_nom, 0, '.', ',') ?>" readonly>
 										</div>
 									</div>
 								</div>
@@ -83,9 +83,9 @@
 								</div>
 								<div class="col-md-6">
 									<div class="form-group">
-										<label class="control-label col-md-4">Maksimal Penggunaan</label>
+										<label class="control-label col-md-4">Nominal Fasilitas</label>
 										<div class="col-md-6">
-											<input type="text" class="form-control" name="maks_guna" id="maks_guna" value="<?= number_format($row->nom_fasilitas, 0, '.', ',') ?>">
+											<input type="text" class="form-control" value="<?= number_format($row->nom_fasilitas, 0, '.', ',') ?>" readonly>
 										</div>
 									</div>
 								</div>

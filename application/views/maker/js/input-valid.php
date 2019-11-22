@@ -90,9 +90,6 @@
                         regexp: {
                             regexp: numb,
                             message: 'Please enter only number characters'
-                        },
-                        stringLength: {
-                            max: 10
                         }
                     }
                 },
@@ -106,7 +103,8 @@
                             message: 'Please enter only number characters'
                         },
                         stringLength: {
-                            max: 10
+                            min: 8,
+                            max: 12
                         }
                     }
                 },
@@ -143,7 +141,23 @@
                             message: 'Please enter only number characters'
                         },
                         stringLength: {
-                            max: 16
+                            min: 10,
+                            max: 15
+                        }
+                    }
+                },
+                rek_pokok: {
+                    validators: {
+                        notEmpty: {
+                            message: msg
+                        },
+                        regexp: {
+                            regexp: numb,
+                            message: 'Please enter only number characters'
+                        },
+                        stringLength: {
+                            min: 10,
+                            max: 15
                         }
                     }
                 },
@@ -190,6 +204,7 @@
                             'case': 'upper'
                         },
                         stringLength: {
+                            min: 10,
                             max: 35
                         },
                         regexp: {
@@ -228,9 +243,6 @@
                             regexp: /^[0-9,]+$/,
                             message: 'Please enter only number characters'
                         },
-                        stringLength: {
-                            max: 19
-                        },
                         callback: {
                             callback: function(value, validator, $field){
                                 var val = $field.val()
@@ -256,6 +268,7 @@
                             message: 'This field must contain alfanumberic and special characters'
                         },
                         stringLength: {
+                            min: 5,
                             max: 30
                         }
                     }
@@ -270,6 +283,7 @@
                             message: 'Please enter only number characters'
                         },
                         stringLength: {
+                            min: 8,
                             max: 20
                         }
                     }
@@ -284,6 +298,7 @@
                             message: 'Please enter only number characters'
                         },
                         stringLength: {
+                            min: 8,
                             max: 20
                         }
                     }
@@ -298,6 +313,7 @@
                             message: 'Please enter only number characters'
                         },
                         stringLength: {
+                            min: 8,
                             max: 20
                         }
                     }
@@ -312,6 +328,7 @@
                             message: 'This field must contain alfanumberic and special characters'
                         },
                         stringLength: {
+                            min: 5,
                             max: 30
                         }
                     }
@@ -326,6 +343,7 @@
                             message: 'This field must contain alfanumberic and special characters'
                         },
                         stringLength: {
+                            min: 5,
                             max: 30
                         }
                     }

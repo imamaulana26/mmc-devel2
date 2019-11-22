@@ -84,32 +84,4 @@ class Cabang extends CI_Controller
         }
         redirect(ucfirst('admin/cabang'));
     }
-
-
-    function print_cabang()
-    {
-        global $title;
-        $fpdf = new PDF('L');
-        $title = 'Laporan Daftar Cabang';
-        $fpdf->SetTitle($title);
-        $fpdf->AliasNbPages();
-
-        $fpdf->AddPage();
-        
-        // load data cabang
-        $cabang = $this->db->get('tbl_cabang')->result_array();
-        // set body table
-        $fpdf->SetFont('Times', '', 10);
-        $no = 1;
-        foreach ($cabang as $dt) {
-            $fpdf->Cell(25);
-            $fpdf->Cell(10, 6, $no++, 1, 0, 'C');
-            $fpdf->Cell(35, 6, $dt['kd_cabang'], 1, 0, 'L');
-            $fpdf->Cell(80, 6, $dt['nama_cabang'], 1, 0, 'L');
-            $fpdf->Cell(80, 6, $dt['area'], 1, 0, 'L');
-            $fpdf->Cell(20, 6, $dt['region'], 1, 1, 'C');
-        }
-        // give the name file
-        $fpdf->Output('I', 'Cabang.pdf');
-    }
 }

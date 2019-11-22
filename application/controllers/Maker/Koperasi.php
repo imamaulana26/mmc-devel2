@@ -70,7 +70,6 @@ class Koperasi extends CI_Controller
 			'cabang' => $this->session->userdata('cabang'),
 			'nama_kop' => input($this->input->post('nama_kop')),
 			'npwp' => input($this->input->post('npwp')),
-			'nominal' => str_replace(',', '', input($this->input->post('nominal'))),
 			'rek_agent' => input($this->input->post('rek_agent')),
 			'rek_escrow' => input($this->input->post('rek_escrow')),
 			'mata_uang' => 'IDR',
@@ -93,12 +92,17 @@ class Koperasi extends CI_Controller
 
 		if ($method == 'add') {
 			if ($qry->num_rows() > 0) {
-				$this->session->set_flashdata('Error', 'Data koperasi '.$key.' telah tersedia!');
+				$this->session->set_flashdata('Error', 'Data koperasi ' . $key . ' telah tersedia!');
 				$this->index();
 			} else {
 				$log['detail'] = "data koperasi " . $key . " - " . $data['nama_kop'] . " berhasil disimpan!";
 
 				$this->m_koperasi->insertData($data);
+				$this->db->update(
+					'tbl_koperasi', 
+					['sisa_nom' => str_replace(',', '', input($this->input->post('nominal'))), 'nominal' => str_replace(',', '', input($this->input->post('nominal')))], 
+					['cif_induk' => $key]
+				);
 				$this->m_log->insert($log);
 				$this->session->set_flashdata('Info', 'Data koperasi ' . $key . ' - ' . $data['nama_kop'] . ' berhasil disimpan!');
 
@@ -108,7 +112,14 @@ class Koperasi extends CI_Controller
 			if ($akses == 'Reviewer') {
 				$this->m_koperasi->updateData($key, ['id_fasilitas' => input($this->input->post('id_fasilitas'))]);
 			} else {
-				$this->m_koperasi->updateData($key, $data);
+				$get_data = $this->db->get_where('tbl_koperasi', ['cif_induk' => $key])->row_array();
+				if($get_data['nominal'] < str_replace(',', '', $this->input->post('nominal'))){
+					$this->session->set_flashdata('Error', 'Nominal tersedia melebihi nominal awal!');
+					$this->index(); return;
+				} else {
+					$this->db->update('tbl_koperasi', ['sisa_nom' => str_replace(',', '', input($this->input->post('nominal')))], ['cif_induk' => $key]);
+					$this->m_koperasi->updateData($key, $data);
+				}
 			}
 			$log['detail'] = "data koperasi " . $key . " - " . $data['nama_kop'] . " berhasil diubah!";
 

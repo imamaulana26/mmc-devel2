@@ -66,9 +66,16 @@
 					</div>
 
 					<div class="form-group">
+						<label class="control-label col-md-2">Nominal Awal</label>
+						<div class="col-md-3">
+							<input type="text" class="form-control" value="<?= number_format($dt->nominal, 0, '.', ',') ?>" readonly>
+						</div>
+					</div>
+
+					<div class="form-group">
 						<label class="control-label col-md-2">Nominal Tersedia</label>
 						<div class="col-md-3">
-							<input type="text" class="form-control" name="nominal" id="nominal" value="<?= number_format($dt->nominal, 0, '.', ',') ?>">
+							<input type="text" class="form-control" name="nominal" id="nominal" value="<?= number_format($dt->sisa_nom, 0, '.', ',') ?>">
 						</div>
 					</div>
 

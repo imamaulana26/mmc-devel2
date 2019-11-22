@@ -136,7 +136,7 @@
                                                     <label>Maksimal Penggunaan</label>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <p>Rp. <?= number_format($dt->nom_max_guna, 0, '.', ',') ?></p>
+                                                    <p>Rp. <?= number_format($dt->sisa_nom, 0, '.', ',') ?></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -294,7 +294,7 @@
                                                     <label>Maksimal Penggunaan</label>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <p>Rp. <?= number_format($dt->nom_max_guna, 0, '.', ',') ?></p>
+                                                    <p>Rp. <?= number_format($dt->sisa_nom, 0, '.', ',') ?></p>
                                                 </div>
                                             </div>
                                             <div class="row">
@@ -1124,7 +1124,7 @@
                                                     <label>Nilai Maksimal Pembiayaan</label>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <p>Rp. <?= number_format($dt->nom_max_guna, 0, '.', ',') ?></p>
+                                                    <p>Rp. <?= number_format($dt->sisa_nom, 0, '.', ',') ?></p>
                                                 </div>
                                             </div>
                                             <div class="row">
