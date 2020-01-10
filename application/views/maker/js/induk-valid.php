@@ -33,30 +33,30 @@
 						}
 					}
 				},
-				maks_guna: {
-					validators: {
-						regexp: {
-							regexp: /^[0-9,]+$/,
-							message: 'Please enter only number characters'
-						},
-						stringLength: {
-							max: 19
-						},
-						callback: {
-							callback: function(value, validator, $field) {
-								var val = $field.val();
-								if (val != 0) {
-									return true;
-								} else {
-									return {
-										valid: false,
-										message: 'This value is not valid'
-									}
-								}
-							}
-						}
-					}
-				},
+				// maks_guna: {
+				// 	validators: {
+				// 		regexp: {
+				// 			regexp: /^[0-9,]+$/,
+				// 			message: 'Please enter only number characters'
+				// 		},
+				// 		stringLength: {
+				// 			max: 19
+				// 		},
+				// 		callback: {
+				// 			callback: function(value, validator, $field) {
+				// 				var val = $field.val();
+				// 				if (val != 0) {
+				// 					return true;
+				// 				} else {
+				// 					return {
+				// 						valid: false,
+				// 						message: 'This value is not valid'
+				// 					}
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// },
 				segmen: {
 					validators: {
 						notEmpty: {

@@ -6,12 +6,12 @@ $config['username'] = 'bbg'; // bbg
 $config['password'] = 'BBG1234'; // BBG1234
 $config['database'] = 'bbg'; // bbg
 
-// Config ftp local
+// Config ftp local - PROSES IN
 $config['ftp_host_local'] = '10.9.9.36'; // 10.9.9.36
 $config['ftp_user_local'] = 'ftp_mmc'; // ftp_mmc
 $config['ftp_pass_local'] = 'Bsm123'; // Bsm123
 
-// Config ftp server
+// Config ftp server - PROSES OUT
 $config['ftp_host_srv'] = '10.9.9.36'; // 10.9.9.36
 $config['ftp_user_srv'] = 'ftp_mmc_bbg'; // ftp_mmc
 $config['ftp_pass_srv'] = 'Bsm123'; // Bsm123

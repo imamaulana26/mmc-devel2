@@ -23,7 +23,7 @@ class M_induk extends CI_Model{
 	public function selectJoin($key){
 		$this->db->select('*');
 		$this->db->from('tbl_input');
-		$this->db->join('tbl_induk', 'tbl_input.no_fos = tbl_induk.no_fos', 'inner');
+		$this->db->join('tbl_koperasi', 'tbl_input.cif_induk = tbl_koperasi.cif_induk', 'inner');
 		$this->db->where('tbl_input.no_fos', $key);
 		$query = $this->db->get();
 		return $query;

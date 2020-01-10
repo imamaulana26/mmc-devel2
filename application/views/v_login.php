@@ -39,7 +39,7 @@
                                 <strong><?= $msg ?></strong>
                             </div>
                         <?php } ?>
-                        <form action="<?= site_url(ucfirst('login/ldap')) ?>" method="post" autocomplete="off">
+                        <form action="<?= site_url(ucfirst('login/auth')) ?>" method="post" autocomplete="off">
                             <fieldset>
                                 <div class="form-group input-group">
                                     <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
