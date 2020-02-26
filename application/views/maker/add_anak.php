@@ -10,7 +10,7 @@
             <p class="text-danger">*) Saya <b><?= $this->session->userdata('nama_user') ?></b>, dengan ini menyatakan sebenar-benarnya bahwa apa yang saya input pada Aplikasi ini sesuai dengan dokumen yang ada dan dapat dipertanggung jawabkan.</p>
 			
 			<div class="panel panel-default">
-        		<form action="<?= site_url(ucfirst('maker/anak/simpanData')) ?>" id="formValid" method="post" class="form-horizontal">
+        		<form action="<?= site_url(ucfirst('maker/anak/simpanData')) ?>" id="formValid" method="post" class="form-horizontal" autocomplete="off">
         		<?php foreach($data->result() as $row){ ?>
         		<div class="panel-body">
         			<input type="hidden" name="nip" value="<?= $row->nip_member_kop ?>">

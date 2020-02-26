@@ -7,7 +7,7 @@
 	<div class="col-md-6">
 		<div class="panel panel-default">
 		<?php foreach($data->result() as $row){ ?>
-			<form method="post" id="formValid" action="<?= site_url(ucfirst('maker/agent/simpanData')) ?>" class="form-horizontal">
+			<form method="post" id="formValid" action="<?= site_url(ucfirst('maker/agent/simpanData')) ?>" class="form-horizontal" autocomplete="off">
 				<div class="panel-body">
 					<input type="hidden" name="nip" value="<?= $row->nip ?>">
 					<input type="hidden" name="no_fos" value="<?= $row->no_fos ?>">
