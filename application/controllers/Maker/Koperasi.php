@@ -95,15 +95,15 @@ class Koperasi extends CI_Controller
 
 		if ($method == 'add') {
 			if ($qry->num_rows() > 0) {
-				$this->session->set_flashdata('Error', 'Data koperasi ' . $key . ' telah tersedia!');
+				$this->session->set_flashdata('Error', 'Data koperasi ' . $data['cif_induk'] . ' telah tersedia!');
 				$this->index();
 			} else {
 				$data['cabang'] = $this->session->userdata('cabang');
-				$log['detail'] = "data koperasi " . $key . " - " . $data['nama_kop'] . " berhasil disimpan!";
+				$log['detail'] = "data koperasi " . $data['cif_induk'] . " - " . $data['nama_kop'] . " berhasil disimpan!";
 
 				$this->m_koperasi->insertData($data);
 				$this->m_log->insert($log);
-				$this->session->set_flashdata('Info', 'Data koperasi ' . $key . ' - ' . $data['nama_kop'] . ' berhasil disimpan!');
+				$this->session->set_flashdata('Info', 'Data koperasi ' . $data['cif_induk'] . ' - ' . $data['nama_kop'] . ' berhasil disimpan!');
 
 				$this->index();
 			}
@@ -127,10 +127,10 @@ class Koperasi extends CI_Controller
 			}
 			$this->m_koperasi->updateData($key, $data);
 
-			$log['detail'] = "data koperasi " . $key . " - " . $data['nama_kop'] . " berhasil diubah!";
+			$log['detail'] = "data koperasi " . $data['cif_induk'] . " - " . $data['nama_kop'] . " berhasil diubah!";
 
 			$this->m_log->insert($log);
-			$this->session->set_flashdata('Info', 'Data koperasi ' . $key . ' - ' . $data['nama_kop'] . ' berhasil diubah!');
+			$this->session->set_flashdata('Info', 'Data koperasi ' . $data['cif_induk'] . ' - ' . $data['nama_kop'] . ' berhasil diubah!');
 
 			$this->index();
 		}
