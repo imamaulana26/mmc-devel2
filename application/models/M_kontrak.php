@@ -25,7 +25,7 @@ class M_kontrak extends CI_Model{
 		$this->db->from('tbl_input');
 		$this->db->join('tbl_induk', 'tbl_input.no_fos = tbl_induk.no_fos', 'inner');
 		$this->db->join('tbl_kontrak', 'tbl_input.no_fos = tbl_kontrak.no_fos', 'inner');
-		$this->db->join('tbl_koperasi', 'tbl_input.cif_induk = tbl_koperasi.cif_induk', 'inner');
+		$this->db->join('tbl_koperasi', 'tbl_input.cif_induk = tbl_koperasi.uniqid', 'inner');
 		$this->db->join('tbl_anak', 'tbl_input.no_fos = tbl_anak.no_fos', 'inner');
 		$this->db->where('tbl_input.no_fos', $key);
 		$query = $this->db->get();
@@ -37,7 +37,7 @@ class M_kontrak extends CI_Model{
 		$this->db->from('tbl_input');
 		$this->db->join('tbl_induk', 'tbl_input.no_fos = tbl_induk.no_fos', 'inner');
 		$this->db->join('tbl_anak', 'tbl_input.no_fos = tbl_anak.no_fos', 'inner');
-		$this->db->join('tbl_koperasi', 'tbl_input.cif_induk = tbl_koperasi.cif_induk', 'inner');
+		$this->db->join('tbl_koperasi', 'tbl_input.cif_induk = tbl_koperasi.uniqid', 'inner');
 		// $this->db->join('tbl_agent', 'tbl_input.no_fos = tbl_agent.no_fos', 'inner');
 		$this->db->where('tbl_input.no_fos', $key);
 		$query = $this->db->get();

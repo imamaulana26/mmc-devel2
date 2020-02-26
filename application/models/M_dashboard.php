@@ -14,7 +14,7 @@ class M_dashboard extends CI_Model
 			foreach ($tables as $tab) {
 				$this->db->join($tab, $tab . '.no_fos = tbl_input.no_fos', 'inner');
 			}
-			$this->db->join('tbl_koperasi', 'tbl_koperasi.cif_induk = tbl_input.cif_induk', 'inner');
+			$this->db->join('tbl_koperasi', 'tbl_koperasi.uniqid = tbl_input.cif_induk', 'inner');
 			$this->db->join('tbl_users', 'tbl_users.nip_user = tbl_input.nip_user', 'inner');
 			$this->db->join('tbl_cabang', 'tbl_cabang.kd_cabang = tbl_input.kode_cabang', 'inner');
 			$this->db->order_by('tbl_input.no_fos', 'desc');
@@ -36,7 +36,7 @@ class M_dashboard extends CI_Model
 				}
 				$this->db->join('tbl_users', 'tbl_users.nip_user = tbl_input.nip_user', 'inner');
 				$this->db->join('tbl_cabang', 'tbl_cabang.kd_cabang = tbl_input.kode_cabang', 'inner');
-				$this->db->join('tbl_koperasi', 'tbl_koperasi.cif_induk = tbl_input.cif_induk', 'inner');
+				$this->db->join('tbl_koperasi', 'tbl_koperasi.uniqid = tbl_input.cif_induk', 'inner');
 				$this->db->order_by('tbl_input.no_fos', 'desc');
 				$result = $this->db->get();
 				return $result;
@@ -70,7 +70,7 @@ class M_dashboard extends CI_Model
 		foreach ($tables as $tab) {
 			$this->db->join($tab, $tab . '.no_fos = tbl_input.no_fos', 'inner');
 		}
-		$this->db->join('tbl_koperasi', 'tbl_koperasi.cif_induk = tbl_input.cif_induk', 'inner');
+		$this->db->join('tbl_koperasi', 'tbl_koperasi.uniqid = tbl_input.cif_induk', 'inner');
 		$this->db->join('tbl_users', 'tbl_users.nip_user = tbl_input.nip_user', 'inner');
 		$this->db->join('tbl_cabang', 'tbl_cabang.kd_cabang = tbl_input.kode_cabang', 'inner');
 
@@ -95,7 +95,7 @@ class M_dashboard extends CI_Model
 			foreach ($tables as $tab) {
 				$this->db->join($tab, $tab . '.no_fos = tbl_input.no_fos', 'inner');
 			}
-			$this->db->join('tbl_koperasi', 'tbl_koperasi.cif_induk = tbl_input.cif_induk', 'inner');
+			$this->db->join('tbl_koperasi', 'tbl_koperasi.uniqid = tbl_input.cif_induk', 'inner');
 			$this->db->join('tbl_users', 'tbl_users.nip_user = tbl_input.nip_user', 'inner');
 			$this->db->join('tbl_cabang', 'tbl_cabang.kd_cabang = tbl_input.kode_cabang', 'inner');
 			$this->db->order_by('tbl_input.no_fos', 'desc');
@@ -117,7 +117,7 @@ class M_dashboard extends CI_Model
 				}
 				$this->db->join('tbl_users', 'tbl_users.nip_user = tbl_input.nip_user', 'inner');
 				$this->db->join('tbl_cabang', 'tbl_cabang.kd_cabang = tbl_input.kode_cabang', 'inner');
-				$this->db->join('tbl_koperasi', 'tbl_koperasi.cif_induk = tbl_input.cif_induk', 'inner');
+				$this->db->join('tbl_koperasi', 'tbl_koperasi.uniqid = tbl_input.cif_induk', 'inner');
 				$this->db->order_by('tbl_input.no_fos', 'desc');
 				$result = $this->db->get();
 				return $result;

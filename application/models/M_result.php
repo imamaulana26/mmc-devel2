@@ -30,7 +30,7 @@ class M_result extends CI_Model
 			}
 
 			$this->db->join('tbl_input b', 'a.no_fos = b.no_fos', 'inner');
-			$this->db->join('tbl_koperasi c', 'b.cif_induk = c.cif_induk', 'inner');
+			$this->db->join('tbl_koperasi c', 'b.cif_induk = c.uniqid', 'inner');
 			$this->db->join('tbl_cabang d', 'a.cabang = d.kd_cabang', 'inner');
 			$this->db->where(['b.status' => 'Sukses', 'b.approve' => '4']);
 
@@ -52,7 +52,7 @@ class M_result extends CI_Model
 			$sql = "select * from tbl_input a inner join (";
 			$sql .= "select * from tbl_result where file_name in (select max(file_name) from tbl_result where status = 'Gagal' ";
 			$sql .= "and timestampdiff(day, time_upload, curdate()) < 3 group by no_fos)) b on a.no_fos = b.no_fos ";
-			$sql .= "inner join tbl_koperasi c on a.cif_induk = c.cif_induk ";
+			$sql .= "inner join tbl_koperasi c on a.cif_induk = c.uniqid ";
 			$sql .= "inner join tbl_cabang d on d.kd_cabang = a.kode_cabang ";
 			if ($res['akses_user'] != 'Maker') {
 				for ($i = 0; $i < count($exp); $i++) {
