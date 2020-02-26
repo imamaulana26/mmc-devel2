@@ -78,7 +78,7 @@
 									<td><?= $dt->id_fasilitas ?></td>
 									<?php if ($akses == 'Maker' || $akses == 'Reviewer') { ?>
 										<td class="text-center">
-											<a href="<?= site_url(ucfirst('maker/koperasi/edit_koperasi/')) . $dt->cif_induk ?>">
+											<a href="<?= site_url(ucfirst('maker/koperasi/edit_koperasi/')) . $dt->uniqid ?>">
 												<i class="glyphicon glyphicon-edit" title="Ubah Data"></i>
 											</a>
 										</td>

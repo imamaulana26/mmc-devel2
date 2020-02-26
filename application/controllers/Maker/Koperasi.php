@@ -53,7 +53,7 @@ class Koperasi extends CI_Controller
 
 	function simpan()
 	{
-		$key = input($this->input->post('cif_induk'));
+		$key = uniqid();
 		$method = input($this->input->post('method'));
 		$akses = $this->session->userdata('akses_user');
 
@@ -65,7 +65,8 @@ class Koperasi extends CI_Controller
 		}
 
 		$data = array(
-			'cif_induk' => $key,
+			'uniqid' => $key,
+			'cif_induk' => input($this->input->post('cif_induk')),
 			'nip_user' => $this->session->userdata('nip'),
 			// 'cabang' => $this->session->userdata('cabang'),
 			'nama_kop' => input($this->input->post('nama_kop')),
@@ -118,7 +119,7 @@ class Koperasi extends CI_Controller
 				}
 			}
 
-			$get_data = $this->db->get_where('tbl_koperasi', ['cif_induk' => $key])->row_array();
+			$get_data = $this->db->get_where('tbl_koperasi', ['uniqid' => $key])->row_array();
 			if ($get_data['nominal'] < str_replace(',', '', $this->input->post('sisa_nom'))) {
 				$this->session->set_flashdata('Error', $data['nama_kop'] . ' - Nominal tersedia tidak boleh melebihi nominal awal!');
 				$this->index();

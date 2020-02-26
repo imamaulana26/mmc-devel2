@@ -13,6 +13,7 @@
 			<div class="panel panel-default">
 				<div class="panel-body">
 					<input type="hidden" name="method" value="update">
+					<input type="hidden" name="uniqid" value="<?= $dt->uniqid ?>">
 
 					<?php if ($this->session->userdata('akses_user') == 'Reviewer') { ?>
 						<div class="form-group">

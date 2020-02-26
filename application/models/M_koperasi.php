@@ -12,13 +12,13 @@ class M_koperasi extends CI_Model{
 	}
 
 	function getData($key){
-		$this->db->where('cif_induk', $key);
+		$this->db->where('uniqid', $key);
 		$result = $this->db->get('tbl_koperasi');
 		return $result;
 	}
 
 	function updateData($key, $data){
-		$this->db->where('cif_induk', $key);
+		$this->db->where('uniqid', $key);
 		$this->db->update('tbl_koperasi', $data);
 	}
 
