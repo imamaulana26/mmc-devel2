@@ -133,7 +133,20 @@
                                 <tr>
                                     <td><?= $no++ ?></td>
                                     <td>
-                                        <a href="" data-toggle="modal" data-target="#detail<?= $row['no_fos'] ?>" title="Detail"><?= $row['no_fos'] ?></a>
+                                        <?php $this->db->select('a.no_fos')->from('tbl_input a');
+                                        $this->db->join('tbl_induk b', 'a.no_fos = b.no_fos', 'inner');
+                                        $this->db->join('tbl_anak c', 'a.no_fos = c.no_fos', 'inner');
+                                        $this->db->join('tbl_link e', 'a.no_fos = e.no_fos', 'inner');
+                                        $this->db->join('tbl_jaminan f', 'a.no_fos = f.no_fos', 'inner');
+                                        $this->db->join('tbl_asset g', 'a.no_fos = g.no_fos', 'inner');
+                                        $this->db->join('tbl_kontrak h', 'a.no_fos = h.no_fos', 'inner');
+                                        $data = $this->db->get();
+
+                                        $mark = "";
+                                        if ($data->num_rows() < 6) {
+                                            $mark = "<i class='fa fa-fw fa-bookmark'></i> ";
+                                        } ?>
+                                        <?= $mark ?> <a href="" data-toggle="modal" data-target="#detail<?= $row['no_fos'] ?>" title="Detail"><?= $row['no_fos'] ?></a>
                                     </td>
                                     <td><?= $row['nama_cabang'] ?></td>
                                     <td><?= $row['nama_kop'] ?></td>
