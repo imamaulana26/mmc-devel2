@@ -47,7 +47,8 @@ class M_list extends CI_Model
 
 		if ($akses == 'Maker') {
 			$this->db->select('a.*, b.nama_cabang')->from('tbl_koperasi a')->join('tbl_cabang b', 'a.cabang = b.kd_cabang', 'inner');
-			$this->db->where('a.cabang', $cabang)->group_by('cif_induk');
+			// $this->db->where('a.cabang', $cabang)->group_by('cif_induk');
+			$this->db->where('a.cabang', $cabang);
 			$query = $this->db->get();
 			return $query;
 		} else {
@@ -62,7 +63,7 @@ class M_list extends CI_Model
 					$this->db->or_where('a.cabang', $exp[$i]);
 				}
 				// $this->db->join('tbl_koperasi', 'tbl_koperasi.cif_induk = tbl_input.cif_induk', 'inner');
-				$this->db->order_by('a.cabang', 'asc');
+				// $this->db->order_by('a.cabang', 'asc');
 				$result = $this->db->get();
 				return $result;
 			}
