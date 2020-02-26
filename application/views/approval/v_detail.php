@@ -12,9 +12,9 @@
                         <div class="col-md-12">
                             <p><?= $fail->file_name ?></p><br>
                             <?php $lines = file('./result_txt/' . $fail->file_name);
-                                foreach ($lines as $line) {
-                                    echo "<p>" . $line . "</p>";
-                                } ?>
+                            foreach ($lines as $line) {
+                                echo "<p>" . $line . "</p>";
+                            } ?>
                         </div>
                     </div>
                 </div>
@@ -280,7 +280,7 @@
                                                         <label>Maksimal Penggunaan</label>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <p>Rp. <?= number_format($dt->sisa_nom, 0, '.', ',') ?></p>
+                                                        <p>Rp. <?= number_format($dt->nom_max_guna, 0, '.', ',') ?></p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -428,7 +428,7 @@
                                                         <label>Maksimal Penggunaan</label>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <p>Rp. <?= number_format($dt->sisa_nom, 0, '.', ',') ?></p>
+                                                        <p>Rp. <?= number_format($dt->nom_max_guna, 0, '.', ',') ?></p>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -455,11 +455,11 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <?php $lokasi = $this->db->get('tbl_lokasi');
-                                                            foreach ($lokasi->result() as $lok) {
-                                                                if ($lok->id == $dt->lokasi_proyek) {
-                                                                    echo "<p>" . $lok->id . " - " . $lok->deskripsi . "</p>";
-                                                                }
-                                                            } ?>
+                                                        foreach ($lokasi->result() as $lok) {
+                                                            if ($lok->id == $dt->lokasi_proyek) {
+                                                                echo "<p>" . $lok->id . " - " . $lok->deskripsi . "</p>";
+                                                            }
+                                                        } ?>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -492,11 +492,11 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <?php $sektor = $this->db->get('tbl_sektor');
-                                                            foreach ($sektor->result() as $sek) {
-                                                                if ($sek->id == $dt->sektor_ekonomi) {
-                                                                    echo "<p>" . $sek->id . " - " . $sek->deskripsi . "</p>";
-                                                                }
-                                                            } ?>
+                                                        foreach ($sektor->result() as $sek) {
+                                                            if ($sek->id == $dt->sektor_ekonomi) {
+                                                                echo "<p>" . $sek->id . " - " . $sek->deskripsi . "</p>";
+                                                            }
+                                                        } ?>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -505,14 +505,14 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <?php if ($dt->status_cair == 0) {
-                                                                echo "<p>" . $dt->status_cair . " - Baru</p>";
-                                                            } else {
-                                                                for ($i = 1; $i <= 5; $i++) {
-                                                                    if ($dt->status_cair == $i) {
-                                                                        echo "<p>" . $dt->status_cair . " - Perpanjangan ke-" . $i . "</p>";
-                                                                    }
+                                                            echo "<p>" . $dt->status_cair . " - Baru</p>";
+                                                        } else {
+                                                            for ($i = 1; $i <= 5; $i++) {
+                                                                if ($dt->status_cair == $i) {
+                                                                    echo "<p>" . $dt->status_cair . " - Perpanjangan ke-" . $i . "</p>";
                                                                 }
-                                                            } ?>
+                                                            }
+                                                        } ?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1065,10 +1065,10 @@
                                             </div>
                                             <div class="col-md-3">
                                                 <?php $exp = explode("::", $dt->tenor_bank);
-                                                    $jmlh = count($exp);
-                                                    for ($i = 0; $i < $jmlh; $i++) {
-                                                        echo "<p>" . $exp[$i] . " Bulan</p>";
-                                                    } ?>
+                                                $jmlh = count($exp);
+                                                for ($i = 0; $i < $jmlh; $i++) {
+                                                    echo "<p>" . $exp[$i] . " Bulan</p>";
+                                                } ?>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -1077,10 +1077,10 @@
                                             </div>
                                             <div class="col-md-3">
                                                 <?php $exp = explode("::", $dt->rate_bank);
-                                                    $jmlh = count($exp);
-                                                    for ($i = 0; $i < $jmlh; $i++) {
-                                                        echo "<p>" . $exp[$i] . " %</p>";
-                                                    } ?>
+                                                $jmlh = count($exp);
+                                                for ($i = 0; $i < $jmlh; $i++) {
+                                                    echo "<p>" . $exp[$i] . " %</p>";
+                                                } ?>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -1224,7 +1224,7 @@
                                                         <label>Nilai Maksimal Pembiayaan</label>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <p>Rp. <?= number_format($dt->sisa_nom, 0, '.', ',') ?></p>
+                                                        <p>Rp. <?= number_format($dt->nom_max_guna, 0, '.', ',') ?></p>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -1273,14 +1273,14 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <?php $data = '';
-                                                            if ($dt->segmentasi == 'CONS') {
-                                                                $data = 'Konsumer (Konsumtif)';
-                                                            } elseif ($dt->segmentasi == 'INV') {
-                                                                $data = 'Investasi (Produktif)';
-                                                            } else {
-                                                                $data = 'Modal Kerja (Produktif)';
-                                                            }
-                                                            echo "<p>" . $dt->segmentasi . " - " . $data . "</p>"; ?>
+                                                        if ($dt->segmentasi == 'CONS') {
+                                                            $data = 'Konsumer (Konsumtif)';
+                                                        } elseif ($dt->segmentasi == 'INV') {
+                                                            $data = 'Investasi (Produktif)';
+                                                        } else {
+                                                            $data = 'Modal Kerja (Produktif)';
+                                                        }
+                                                        echo "<p>" . $dt->segmentasi . " - " . $data . "</p>"; ?>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -1387,22 +1387,22 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <?php $exp = explode("::", $dt->kode_biaya);
-                                                            $jmlh = count($exp);
-                                                            for ($i = 0; $i < $jmlh; $i++) {
-                                                                if ($exp[$i] == 'FINAPP') {
-                                                                    echo "<p>" . $exp[$i] . " - Biaya Penilaian</p>";
-                                                                } elseif ($exp[$i] == 'FINDIS') {
-                                                                    echo "<p>" . $exp[$i] . " - Biaya Pencairan Murabahah</p>";
-                                                                } elseif ($exp[$i] == 'FININS') {
-                                                                    echo "<p>" . $exp[$i] . " - Biaya Asuransi</p>";
-                                                                } elseif ($exp[$i] == 'FINNTRY') {
-                                                                    echo "<p>" . $exp[$i] . " - Biaya Notaris</p>";
-                                                                } elseif ($exp[$i] == 'FINOTH') {
-                                                                    echo "<p>" . $exp[$i] . " - Biaya Lain - lain</p>";
-                                                                } else {
-                                                                    echo "<p>" . $exp[$i] . " - Biaya Materai</p>";
-                                                                }
-                                                            } ?>
+                                                        $jmlh = count($exp);
+                                                        for ($i = 0; $i < $jmlh; $i++) {
+                                                            if ($exp[$i] == 'FINAPP') {
+                                                                echo "<p>" . $exp[$i] . " - Biaya Penilaian</p>";
+                                                            } elseif ($exp[$i] == 'FINDIS') {
+                                                                echo "<p>" . $exp[$i] . " - Biaya Pencairan Murabahah</p>";
+                                                            } elseif ($exp[$i] == 'FININS') {
+                                                                echo "<p>" . $exp[$i] . " - Biaya Asuransi</p>";
+                                                            } elseif ($exp[$i] == 'FINNTRY') {
+                                                                echo "<p>" . $exp[$i] . " - Biaya Notaris</p>";
+                                                            } elseif ($exp[$i] == 'FINOTH') {
+                                                                echo "<p>" . $exp[$i] . " - Biaya Lain - lain</p>";
+                                                            } else {
+                                                                echo "<p>" . $exp[$i] . " - Biaya Materai</p>";
+                                                            }
+                                                        } ?>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -1411,10 +1411,10 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <?php $exp = explode("::", $dt->nom_biaya);
-                                                            $jmlh = count($exp);
-                                                            for ($i = 0; $i < $jmlh; $i++) {
-                                                                echo "<p>Rp. " . number_format($exp[$i], 0, '.', ',') . "</p>";
-                                                            } ?>
+                                                        $jmlh = count($exp);
+                                                        for ($i = 0; $i < $jmlh; $i++) {
+                                                            echo "<p>Rp. " . number_format($exp[$i], 0, '.', ',') . "</p>";
+                                                        } ?>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -1474,13 +1474,14 @@
                                         <button type="submit" name="reject" class="btn btn-default">
                                             Revisi <i class="fa fa-fw fa-edit"></i>
                                         </button>
-                                        <?php if ($dt->nip_approval == '') { ?>
+                                        <?php if ($dt->status != 'Gagal') { ?>
                                             <button type="submit" name="approve" class="btn btn-default">
                                                 Approved <i class="fa fa-fw fa-check-square-o"></i>
                                             </button>
                                         <?php } ?>
                                     </div>
-                                <?php } else { ?>
+                                <?php }
+                                if ($this->session->userdata('akses_user') == 'Approval') { ?>
                                     <div class="modal-footer">
                                         <button type="submit" name="reject" class="btn btn-default">
                                             Revisi <i class="fa fa-fw fa-edit"></i>

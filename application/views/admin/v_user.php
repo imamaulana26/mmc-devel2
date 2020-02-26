@@ -28,6 +28,7 @@
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th>Status</th>
                                 <th>Akses User</th>
                                 <th>No Employe</th>
                                 <th>Nama Lengkap</th>
@@ -42,6 +43,13 @@
                             foreach ($list as $li) { ?>
                                 <tr>
                                     <td><?= $no++ ?></td>
+                                    <td class="text-center">
+                                        <?php if($li->enable == '0'){
+                                            echo "<input type='checkbox' class='form-check-input' data-nip='".$li->nip_user."' checked='checked'>";
+                                        } else {
+                                            echo "<input type='checkbox' class='form-check-input' data-nip='".$li->nip_user."'>";
+                                        } ?>
+                                    </td>
                                     <td><?php if ($li->akses_user != 'Maker') { ?>
                                             <p style="color: #337ab7; cursor: pointer; text-decoration: underline" data-user="<?= $li->nip_user ?>" id="lv_user">
                                                 <?= cetak($li->akses_user) ?>

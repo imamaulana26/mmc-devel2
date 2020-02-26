@@ -73,7 +73,20 @@ class User extends CI_Controller
 		);
 
 		ob_start('ob_gzhandler');
+		$this->load->view('layout/_header');
 		$this->load->view('layout/_content', $isi);
+	}
+
+	function upd_status()
+	{
+		$nip = $this->input->post('nip');
+
+		$result = $this->db->get_where('tbl_users', ['nip_user' => $nip, 'enable' => '1']);
+		if ($result->num_rows() > 0) {
+            $this->db->update('tbl_users', ['enable' => '0'], ['nip_user' => $nip]);
+        } else {
+            $this->db->update('tbl_users', ['enable' => '1'], ['nip_user' => $nip]);
+		}
 	}
 
 
@@ -119,6 +132,7 @@ class User extends CI_Controller
 				$this->add_user();
 			} else {
 				$data['nip_user'] = $key;
+				$data['enable'] = 0;
 
 				$log['detail'] = $key . " berhasil menambahkan Data Users";
 

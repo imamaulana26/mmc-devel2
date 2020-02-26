@@ -135,18 +135,19 @@ class Input extends CI_Controller
 
 			redirect(site_url(ucfirst('maker/induk/add_induk/' . $key)));
 		} else {
-			$proses = $this->db->get_where('tbl_result', ['no_fos' => $key, 'status' => 'Gagal']);
-			if ($proses->num_rows() > 0) {
-				$data['kode'] = $_POST['kode'] + 1;
-			} else {
-				$data['kode'] = $_POST['kode'];
-			}
+			// $proses = $this->db->get_where('tbl_result', ['no_fos' => $key, 'status' => 'Gagal']);
+			// if ($proses->num_rows() > 0) {
+			// 	$data['kode'] = $_POST['kode'] + 1;
+			// } else {
+			// 	$data['kode'] = $_POST['kode'];
+			// }
 
 			$log['detail'] = "data input " . $key . " berhasil diubah";
 			if ($akses == 'Maker') {
 				$data['nip_user'] = $nip;
 			} else {
 				$data['nip_reviewer'] = $nip;
+				$data['tgl_cair'] = $this->input->post('tgl_cair');
 			}
 
 			$this->m_input->updateData($key, $data);

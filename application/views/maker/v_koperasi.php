@@ -46,7 +46,7 @@
 								<th>Tenor Bank</th>
 								<th>Rate Agent</th>
 								<th>Kode Koperasi</th>
-								<?php if ($akses != 'Checker') {
+								<?php if ($akses == 'Maker' || $akses == 'Reviewer') {
 									echo "<th>Aksi</th>";
 								} ?>
 							</tr>

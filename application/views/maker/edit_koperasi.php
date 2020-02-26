@@ -18,7 +18,10 @@
 						<div class="form-group">
 							<label class="control-label col-md-2">Kode Koperasi</label>
 							<div class="col-md-3">
-								<input type="text" class="form-control" name="id_fasilitas" value="<?= $dt->id_fasilitas ?>">
+								<div class="input-group">
+									<span class="input-group-addon">LNGP</span>
+									<input type="text" class="form-control" name="id_fasilitas" value="<?= str_replace('LNGP', '', $dt->id_fasilitas) ?>">
+								</div>
 							</div>
 						</div>
 					<?php } ?>
@@ -68,14 +71,14 @@
 					<div class="form-group">
 						<label class="control-label col-md-2">Nominal Awal</label>
 						<div class="col-md-3">
-							<input type="text" class="form-control" value="<?= number_format($dt->nominal, 0, '.', ',') ?>" readonly>
+							<input type="text" class="form-control" name="nominal" id="nominal" value="<?= number_format($dt->nominal, 0, '.', ',') ?>" readonly>
 						</div>
 					</div>
 
 					<div class="form-group">
 						<label class="control-label col-md-2">Nominal Tersedia</label>
 						<div class="col-md-3">
-							<input type="text" class="form-control" name="nominal" id="nominal" value="<?= number_format($dt->sisa_nom, 0, '.', ',') ?>">
+							<input type="text" class="form-control" name="sisa_nom" id="sisa_nom" value="<?= number_format($dt->sisa_nom, 0, '.', ',') ?>">
 						</div>
 					</div>
 
@@ -83,13 +86,13 @@
 						<label class="control-label col-md-2">Tenor Bank <a href="#" class="btn-add-1">+</a></label>
 						<div class="col-md-2 multiple-form-group-1">
 							<?php $exp = explode("::", $dt->tenor_bank);
-								$jmlh = count($exp);
-								if ($exp[0]) { ?>
+							$jmlh = count($exp);
+							if ($exp[0]) { ?>
 								<div style="margin-bottom: 10px">
 									<input type="text" name="tenor_bank[]" class="form-control" value="<?= $exp[0] ?>" placeholder="Ex. 12">
 								</div>
 							<?php }
-								for ($i = 1; $i < $jmlh; $i++) { ?>
+							for ($i = 1; $i < $jmlh; $i++) { ?>
 								<div class="input-group" style="margin-bottom: 10px">
 									<input type="text" name="tenor_bank[]" value="<?= $exp[$i] ?>" class="form-control" placeholder="Ex. 12">
 									<div class="input-group-addon btn btn-remove btn-danger">-</div>
@@ -102,13 +105,13 @@
 						<label class="control-label col-md-2">Rate Bank <a href="#" class="btn-add-2">+</a></label>
 						<div class="col-md-2 multiple-form-group-2">
 							<?php $exp = explode("::", $dt->rate_bank);
-								$jmlh = count($exp);
-								if ($exp[0]) { ?>
+							$jmlh = count($exp);
+							if ($exp[0]) { ?>
 								<div style="margin-bottom: 10px">
 									<input type="text" name="rate_bank[]" class="form-control" value="<?= $exp[0] ?>" placeholder="Ex. 15.00">
 								</div>
 							<?php }
-								for ($i = 1; $i < $jmlh; $i++) { ?>
+							for ($i = 1; $i < $jmlh; $i++) { ?>
 								<div class="input-group" style="margin-bottom: 10px">
 									<input type="text" name="rate_bank[]" class="form-control" value="<?= $exp[$i] ?>" placeholder="Ex. 15.00">
 									<div class="input-group-addon btn btn-remove btn-danger">-</div>

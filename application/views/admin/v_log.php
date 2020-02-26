@@ -41,3 +41,11 @@
 	    </div>
 	</div>
 </div>
+
+<?php $this->load->view('layout/_footer'); ?>
+
+<script>
+	$(document).ready(function() {
+		$('.detail').DataTable();
+	});
+</script>

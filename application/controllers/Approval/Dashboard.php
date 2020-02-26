@@ -270,7 +270,7 @@ class Dashboard extends CI_Controller
 		ftp_login($ftp_conn, $ftp_username, $ftp_userpass);
 
 		$get_file = $this->db->get_where('tbl_log_file', ['nip_approval' => $this->session->userdata('nip'), 'time_proses' => date('Y-m-d')]);
-		$count = $get_file->num_rows();
+		// $count = $get_file->num_rows();
 
 		foreach ($get_file->result_array() as $get_file) {
 			$local_file = "./result_txt/" . $get_file['file_proses'];
@@ -278,7 +278,7 @@ class Dashboard extends CI_Controller
 			// download server file
 			$upload = ftp_get($ftp_conn, $local_file, $server_file, FTP_BINARY);
 			if (!$upload) {
-				$this->session->set_flashdata('Proses', $count . ' file sedang di proses...');
+				$this->session->set_flashdata('Proses', 'file sedang di proses...');
 			} else {
 				$get_res = $this->db->get_where('tbl_result', ['file_name' => $get_file['file_proses']]);
 				// jika file_proses belum ada di tbl_result maka kirim email
@@ -288,10 +288,10 @@ class Dashboard extends CI_Controller
 
 					$config = array(
 						'mailtype' => 'html',
-						'protocol' => 'mail',
-						'smtp_host' => 'webmail.syariahmandiri.co.id',
-						'smtp_user' => 'adminmmc@syariahmandiri.co.id',
-						'smtp_pass' => 'Bsm123',
+						'protocol' => $this->config->item('protocol'),
+						'smtp_host' => $this->config->item('smtp_host'),
+						'smtp_user' => $this->config->item('smtp_user'),
+						'smtp_pass' => $this->config->item('smtp_pass'),
 						'smtp_port' => 25,
 						'newline' => "\r\n"
 					);
@@ -373,7 +373,8 @@ class Dashboard extends CI_Controller
 							$msg .= "<i>*) Harap tidak membalas pesan ini.</i>";
 
 							// update sisa nominal pada koperasi
-							$this->db->update('tbl_koperasi', ['sisa_nom' => 'nominal' - $dt_mail['nom_fasilitas']], ['cif_induk' => $dt_mail['cif_induk']]);
+							$sisa_nom = $this->db->get_where('tbl_koperasi', ['cif_induk' => $dt_mail['cif_induk']])->row_array();
+							$this->db->update('tbl_koperasi', ['sisa_nom' => $sisa_nom['sisa_nom'] - $dt_mail['nom_fasilitas']], ['cif_induk' => $dt_mail['cif_induk']]);
 
 							// kirim email ke user maker, checker, reviewer, approval
 							$this->db->select('*')->from('tbl_input')->where('no_fos', $data['no_fos']);
@@ -401,7 +402,7 @@ class Dashboard extends CI_Controller
 							$this->email->message($msg);
 
 							if ($this->email->send()) {
-								$this->session->set_flashdata('Email', $count . ' hasil proses berhasil dikirim ke email');
+								$this->session->set_flashdata('Email', 'hasil proses berhasil dikirim ke email');
 								$this->session->unset_userdata('Proses');
 							}
 						} else {
@@ -498,7 +499,7 @@ class Dashboard extends CI_Controller
 							$this->email->message($msg);
 
 							if ($this->email->send()) {
-								$this->session->set_flashdata('Email', $count . ' hasil proses berhasil dikirim ke email');
+								$this->session->set_flashdata('Email', 'hasil proses berhasil dikirim ke email');
 								$this->session->unset_userdata('Proses');
 							}
 						}
@@ -546,11 +547,16 @@ class Dashboard extends CI_Controller
 			$fpdf->Ln(10);
 			$fpdf->Cell(30, 6, 'Assalamu`alaikum Warahmatullahi Wabarakatuh.', 0, 1);
 			$fpdf->SetFont('Times', '', 10);
+			
 			$bln = array(1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember');
 			$tgl_akad = explode('-', $res['tgl_akad']);
 			$tgl_pks = explode('-', $res['tgl_pks']);
-			$fpdf->Cell(30, 6, 'Sehubungan dengan telah ditandatanganinya akad pembiayaan tanggal ' . $tgl_akad[2] . ' ' . $bln[$tgl_akad[1]] . ' ' . $tgl_akad[0] . ' dan surat nasabah ', 0, 1);
-			$fpdf->Cell(30, 6, $res['nama_nsbh'] . ' No. ' . $res['no_pks'] . ' tanngal ' . $tgl_pks[2] . ' ' . $bln[$tgl_pks[1]] . ' ' . $tgl_pks[0] . ' agar dilakukan pencairan kepada', 0, 1);
+
+			$bln_akad = substr($tgl_akad[1], 0, 1) > 0 ? $tgl_akad[1] : substr($tgl_akad[1], -1);
+			$bln_pks = substr($tgl_pks[1], 0, 1) > 0 ? $tgl_pks[1] : substr($tgl_pks[1], -1);
+
+			$fpdf->Cell(30, 6, 'Sehubungan dengan telah ditandatanganinya akad pembiayaan tanggal ' . $tgl_akad[2] . ' ' . $bln[$bln_akad] . ' ' . $tgl_akad[0] . ' dan surat nasabah ', 0, 1);
+			$fpdf->Cell(30, 6, $res['nama_nsbh'] . ' No. ' . $res['no_pks'] . ' tanngal ' . $tgl_pks[2] . ' ' . $bln[$bln_pks] . ' ' . $tgl_pks[0] . ' agar dilakukan pencairan kepada', 0, 1);
 			$fpdf->Cell(30, 6, 'nasabah tersebut. Untuk kebutuhan itu, kami lampirkan data nasabah dan data jaminan pembiayaan/collateral maintenance.', 0, 0);
 			$fpdf->Ln(10);
 

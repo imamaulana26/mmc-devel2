@@ -104,31 +104,43 @@ class Kontrak extends CI_Controller
 			'waktu' => date('Y-m-d H:i:s')
 		);
 
-		if($this->input->post('method') == 'add'){
-			$log['detail'] = 'PEMBIAYAAN '.$key.' berhasil disimpan';
+		if ($this->input->post('method') == 'add') {
+			$log['detail'] = 'PEMBIAYAAN ' . $key . ' berhasil disimpan';
 
 			$this->m_kontrak->insertData($data);
 			$this->m_log->insert($log);
 
-			$this->session->set_flashdata('Info', 'Data '.$key.' berhasil disimpan!');
-			
-			if($akses == 'Reviewer'){
+			$this->session->set_flashdata('Info', 'Data ' . $key . ' berhasil disimpan!');
+
+			if ($akses == 'Reviewer') {
 				redirect(site_url(ucfirst('approval/dashboard')));
 			} else {
 				redirect(site_url(ucfirst('maker/dashboard')));
 			}
 		} else {
-			if($akses == 'Maker') $this->db->update('tbl_input', ['approve' => '1'], ['no_fos' => $key]);
-			else $this->db->update('tbl_input', ['approve' => '3'], ['no_fos' => $key]);
+			if ($akses == 'Maker') $this->db->update('tbl_input', ['approve' => '1'], ['no_fos' => $key]);
+			// else $this->db->update('tbl_input', ['approve' => '3'], ['no_fos' => $key]);
 
-			$log['detail'] = 'PEMBIAYAAN '.$key.' berhasil diubah';
+			$qry = "select no_fos, max(file_name) as file from tbl_result where no_fos = '" . $key . "' and status = 'Gagal' group by no_fos";
+			$no_file = $this->db->query($qry)->row_array();
+
+			$no = str_replace('.txt', '', substr($no_file['file'], -6));
+			if (!empty($no)) {
+				$kode = substr($no, 1) > 0 ? substr($no, -1) + 1 : $no + 1;
+			} else {
+				$kode = 1;
+			}
+
+			$this->db->update('tbl_input', ['kode' => $kode], ['no_fos' => $key]);
+
+			$log['detail'] = 'PEMBIAYAAN ' . $key . ' berhasil diubah';
 
 			$this->m_kontrak->updateData($key, $data);
 			$this->m_log->insert($log);
 
-			$this->session->set_flashdata('Info', 'Data '.$key.' berhasil diubah!');
-			
-			if($akses == 'Reviewer'){
+			$this->session->set_flashdata('Info', 'Data ' . $key . ' berhasil diubah!');
+
+			if ($akses == 'Reviewer') {
 				redirect(site_url(ucfirst('approval/dashboard')));
 			} else {
 				redirect(site_url(ucfirst('maker/dashboard')));

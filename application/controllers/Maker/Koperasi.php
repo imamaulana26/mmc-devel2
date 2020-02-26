@@ -67,14 +67,16 @@ class Koperasi extends CI_Controller
 		$data = array(
 			'cif_induk' => $key,
 			'nip_user' => $this->session->userdata('nip'),
-			'cabang' => $this->session->userdata('cabang'),
+			// 'cabang' => $this->session->userdata('cabang'),
 			'nama_kop' => input($this->input->post('nama_kop')),
 			'npwp' => input($this->input->post('npwp')),
 			'rek_agent' => input($this->input->post('rek_agent')),
 			'rek_escrow' => input($this->input->post('rek_escrow')),
 			'mata_uang' => 'IDR',
 			'rate_bank' => $rate_bank,
-			'tenor_bank' => $tenor_bank
+			'tenor_bank' => $tenor_bank,
+			'nominal' => str_replace(',', '', input($this->input->post('nominal'))),
+			'sisa_nom' => str_replace(',', '', input($this->input->post('sisa_nom')))
 		);
 
 		date_default_timezone_set('Asia/Jakarta');
@@ -95,32 +97,35 @@ class Koperasi extends CI_Controller
 				$this->session->set_flashdata('Error', 'Data koperasi ' . $key . ' telah tersedia!');
 				$this->index();
 			} else {
+				$data['cabang'] = $this->session->userdata('cabang');
 				$log['detail'] = "data koperasi " . $key . " - " . $data['nama_kop'] . " berhasil disimpan!";
 
 				$this->m_koperasi->insertData($data);
-				$this->db->update(
-					'tbl_koperasi', 
-					['sisa_nom' => str_replace(',', '', input($this->input->post('nominal'))), 'nominal' => str_replace(',', '', input($this->input->post('nominal')))], 
-					['cif_induk' => $key]
-				);
 				$this->m_log->insert($log);
 				$this->session->set_flashdata('Info', 'Data koperasi ' . $key . ' - ' . $data['nama_kop'] . ' berhasil disimpan!');
 
 				$this->index();
 			}
 		} else {
+			$lngp = input($this->input->post('id_fasilitas'));
 			if ($akses == 'Reviewer') {
-				$this->m_koperasi->updateData($key, ['id_fasilitas' => input($this->input->post('id_fasilitas'))]);
-			} else {
-				$get_data = $this->db->get_where('tbl_koperasi', ['cif_induk' => $key])->row_array();
-				if($get_data['nominal'] < str_replace(',', '', $this->input->post('nominal'))){
-					$this->session->set_flashdata('Error', 'Nominal tersedia melebihi nominal awal!');
-					$this->index(); return;
+				if (is_numeric($lngp)) {
+					$data['id_fasilitas'] = 'LNGP' . $lngp;
 				} else {
-					$this->db->update('tbl_koperasi', ['sisa_nom' => str_replace(',', '', input($this->input->post('nominal')))], ['cif_induk' => $key]);
-					$this->m_koperasi->updateData($key, $data);
+					$this->session->set_flashdata('Error', 'Kode koperasi ' . $data['nama_kop'] . ' tidak valid');
+					$this->index();
+					return;
 				}
 			}
+
+			$get_data = $this->db->get_where('tbl_koperasi', ['cif_induk' => $key])->row_array();
+			if ($get_data['nominal'] < str_replace(',', '', $this->input->post('sisa_nom'))) {
+				$this->session->set_flashdata('Error', $data['nama_kop'] . ' - Nominal tersedia tidak boleh melebihi nominal awal!');
+				$this->index();
+				return;
+			}
+			$this->m_koperasi->updateData($key, $data);
+
 			$log['detail'] = "data koperasi " . $key . " - " . $data['nama_kop'] . " berhasil diubah!";
 
 			$this->m_log->insert($log);

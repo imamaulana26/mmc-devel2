@@ -1,8 +1,12 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		var nominal = document.getElementById('nominal');
+		var sisa_nom = document.getElementById('sisa_nom');
 	    nominal.addEventListener('keyup', function(evt){
 	        nominal.value = numeral(this.value).format('0,0');
+	    });
+	    sisa_nom.addEventListener('keyup', function(evt){
+	        sisa_nom.value = numeral(this.value).format('0,0');
 	    });
 
 	    var max = 10;
@@ -147,6 +151,30 @@
 					}
 				},
 				nominal: {
+                    validators: {
+                        regexp: {
+                            regexp: /^[0-9,]+$/,
+                            message: 'Please enter only number characters'
+                        },
+                        stringLength: {
+                            max: 19
+                        },
+                        callback: {
+                            callback: function(value, validator, $field){
+                                var val = $field.val()
+                                if(val != 0){
+                                    return true;
+                                } else{
+                                    return {
+                                        valid: false,
+                                        message: 'This value is not valid'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+				sisa_nom: {
                     validators: {
                         regexp: {
                             regexp: /^[0-9,]+$/,

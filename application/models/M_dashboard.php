@@ -193,7 +193,7 @@ class M_dashboard extends CI_Model
 		$akses = $this->session->userdata('akses_user');
 
 		if ($akses == 'Maker') {
-			$result = $this->db->get_where('tbl_koperasi', ['nip_user' => $nip]);
+			$result = $this->db->get_where('tbl_koperasi', ['cabang' => $this->session->userdata('cabang')]);
 			return $result->num_rows();
 		} else {
 			$result = $this->db->get_where('tbl_users', ['nip_user' => $nip]);

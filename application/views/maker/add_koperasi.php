@@ -55,9 +55,16 @@
 				</div>
 
 				<div class="form-group">
-					<label class="control-label col-md-2">Nominal Tersedia</label>
+					<label class="control-label col-md-2">Nominal Awal</label>
 					<div class="col-md-3">
 						<input type="text" class="form-control" name="nominal" id="nominal">
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="control-label col-md-2">Nominal Tersedia</label>
+					<div class="col-md-3">
+						<input type="text" class="form-control" name="sisa_nom" id="sisa_nom">
 					</div>
 				</div>
 

@@ -43,38 +43,43 @@ class Login extends CI_Controller
 			date_default_timezone_set('Asia/Jakarta');
 			$log_on = date('Y-m-d H:i:s');
 
-			if ($stat == 0 && $sess['akses_user'] == 'Admin') {
-				$this->session->set_userdata($sess);
-				$status = 1;
-				$this->m_login->update($sess['nip'], $status);
-				$this->m_login->log_on($sess['nip'], $log_on);
-				redirect(ucfirst('login/success'));
-			} elseif ($stat == 0 && $sess['akses_user'] == 'Maker') {
-				$this->session->set_userdata($sess);
-				$status = 1;
-				$this->m_login->update($sess['nip'], $status);
-				$this->m_login->log_on($sess['nip'], $log_on);
-				redirect(ucfirst('login/success'));
-			} elseif ($stat == 0 && $sess['akses_user'] == 'Checker') {
-				$this->session->set_userdata($sess);
-				$status = 1;
-				$this->m_login->update($sess['nip'], $status);
-				$this->m_login->log_on($sess['nip'], $log_on);
-				redirect(ucfirst('login/success'));
-			} elseif ($stat == 0 && ($sess['akses_user'] == 'Approval')) {
-				$this->session->set_userdata($sess);
-				$status = 1;
-				$this->m_login->update($sess['nip'], $status);
-				$this->m_login->log_on($sess['nip'], $log_on);
-				redirect(ucfirst('login/success'));
-			} elseif ($stat == 0 && ($sess['akses_user'] == 'Reviewer')) {
-				$this->session->set_userdata($sess);
-				$status = 1;
-				$this->m_login->update($sess['nip'], $status);
-				$this->m_login->log_on($sess['nip'], $log_on);
-				redirect(ucfirst('login/success'));
+			if ($valid['enable'] == '0') {
+				if ($stat == 0 && $sess['akses_user'] == 'Admin') {
+					$this->session->set_userdata($sess);
+					$status = 1;
+					$this->m_login->update($sess['nip'], $status);
+					$this->m_login->log_on($sess['nip'], $log_on);
+					redirect(ucfirst('login/success'));
+				} elseif ($stat == 0 && $sess['akses_user'] == 'Maker') {
+					$this->session->set_userdata($sess);
+					$status = 1;
+					$this->m_login->update($sess['nip'], $status);
+					$this->m_login->log_on($sess['nip'], $log_on);
+					redirect(ucfirst('login/success'));
+				} elseif ($stat == 0 && $sess['akses_user'] == 'Checker') {
+					$this->session->set_userdata($sess);
+					$status = 1;
+					$this->m_login->update($sess['nip'], $status);
+					$this->m_login->log_on($sess['nip'], $log_on);
+					redirect(ucfirst('login/success'));
+				} elseif ($stat == 0 && ($sess['akses_user'] == 'Approval')) {
+					$this->session->set_userdata($sess);
+					$status = 1;
+					$this->m_login->update($sess['nip'], $status);
+					$this->m_login->log_on($sess['nip'], $log_on);
+					redirect(ucfirst('login/success'));
+				} elseif ($stat == 0 && ($sess['akses_user'] == 'Reviewer')) {
+					$this->session->set_userdata($sess);
+					$status = 1;
+					$this->m_login->update($sess['nip'], $status);
+					$this->m_login->log_on($sess['nip'], $log_on);
+					redirect(ucfirst('login/success'));
+				} else {
+					$this->session->set_flashdata('msg', 'Akun sedang digunakan!');
+					redirect(ucfirst('login'));
+				}
 			} else {
-				$this->session->set_flashdata('msg', 'Akun sedang digunakan!');
+				$this->session->set_flashdata('msg', 'Akun sudah tidak aktif!');
 				redirect(ucfirst('login'));
 			}
 		}
@@ -113,38 +118,43 @@ class Login extends CI_Controller
 				date_default_timezone_set('Asia/Jakarta');
 				$log_on = date('Y-m-d H:i:s');
 
-				if ($stat == 0 && $sess['akses_user'] == 'Admin') {
-					$this->session->set_userdata($sess);
-					$status = 1;
-					$this->m_login->update($sess['nip'], $status);
-					$this->m_login->log_on($sess['nip'], $log_on);
-					redirect(ucfirst('login/success'));
-				} elseif ($stat == 0 && $sess['akses_user'] == 'Maker') {
-					$this->session->set_userdata($sess);
-					$status = 1;
-					$this->m_login->update($sess['nip'], $status);
-					$this->m_login->log_on($sess['nip'], $log_on);
-					redirect(ucfirst('login/success'));
-				} elseif ($stat == 0 && $sess['akses_user'] == 'Checker') {
-					$this->session->set_userdata($sess);
-					$status = 1;
-					$this->m_login->update($sess['nip'], $status);
-					$this->m_login->log_on($sess['nip'], $log_on);
-					redirect(ucfirst('login/success'));
-				} elseif ($stat == 0 && ($sess['akses_user'] == 'Approval')) {
-					$this->session->set_userdata($sess);
-					$status = 1;
-					$this->m_login->update($sess['nip'], $status);
-					$this->m_login->log_on($sess['nip'], $log_on);
-					redirect(ucfirst('login/success'));
-				} elseif ($stat == 0 && ($sess['akses_user'] == 'Reviewer')) {
-					$this->session->set_userdata($sess);
-					$status = 1;
-					$this->m_login->update($sess['nip'], $status);
-					$this->m_login->log_on($sess['nip'], $log_on);
-					redirect(ucfirst('login/success'));
+				if ($valid['enable'] == '0') {
+					if ($stat == 0 && $sess['akses_user'] == 'Admin') {
+						$this->session->set_userdata($sess);
+						$status = 1;
+						$this->m_login->update($sess['nip'], $status);
+						$this->m_login->log_on($sess['nip'], $log_on);
+						redirect(ucfirst('login/success'));
+					} elseif ($stat == 0 && $sess['akses_user'] == 'Maker') {
+						$this->session->set_userdata($sess);
+						$status = 1;
+						$this->m_login->update($sess['nip'], $status);
+						$this->m_login->log_on($sess['nip'], $log_on);
+						redirect(ucfirst('login/success'));
+					} elseif ($stat == 0 && $sess['akses_user'] == 'Checker') {
+						$this->session->set_userdata($sess);
+						$status = 1;
+						$this->m_login->update($sess['nip'], $status);
+						$this->m_login->log_on($sess['nip'], $log_on);
+						redirect(ucfirst('login/success'));
+					} elseif ($stat == 0 && ($sess['akses_user'] == 'Approval')) {
+						$this->session->set_userdata($sess);
+						$status = 1;
+						$this->m_login->update($sess['nip'], $status);
+						$this->m_login->log_on($sess['nip'], $log_on);
+						redirect(ucfirst('login/success'));
+					} elseif ($stat == 0 && ($sess['akses_user'] == 'Reviewer')) {
+						$this->session->set_userdata($sess);
+						$status = 1;
+						$this->m_login->update($sess['nip'], $status);
+						$this->m_login->log_on($sess['nip'], $log_on);
+						redirect(ucfirst('login/success'));
+					} else {
+						$this->session->set_flashdata('msg', 'Akun sedang digunakan!');
+						redirect(ucfirst('login'));
+					}
 				} else {
-					$this->session->set_flashdata('msg', 'Akun sedang digunakan!');
+					$this->session->set_flashdata('msg', 'Akun sudah tidak aktif!');
 					redirect(ucfirst('login'));
 				}
 			}
@@ -154,7 +164,8 @@ class Login extends CI_Controller
 			$result = ldap_search($ldap_cons, $ldap_dns, $filter, $attr) or exit('Unable to search LDAP server');
 			$entries = ldap_get_entries($ldap_cons, $result);
 		} else {
-			echo "Failed!";
+			$this->session->set_flashdata('msg', 'LDAP Login failed!');
+			redirect(ucfirst('login'));
 		}
 	}
 

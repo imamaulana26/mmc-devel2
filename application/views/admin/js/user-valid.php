@@ -1,5 +1,20 @@
 <script type="text/javascript">
     $(document).ready(function() {
+        $('tbody').on('click', 'input[type="checkbox"]', function() {
+            var id = $(this).data('nip');
+
+            $.ajax({
+                url: "<?= site_url(ucfirst('admin/user/upd_status')) ?>",
+                type: "POST",
+                data: {
+                    nip: id
+                },
+                success: function() {
+                    location.reload();
+                }
+            });
+        });
+
         var msg = 'This field is required and can\'t be empty';
         var numb = /^[0-9]+$/;
         var char = /^[A-Z. ]+$/;

@@ -71,12 +71,12 @@
                                             <select class="form-control selectpicker" name="nama_kop" id="nama_kop" data-live-search="true" onchange="changeValue(this.value)">
                                                 <option disabled selected value="-">-- Pilih --</option>
                                                 <?php $jsArray = "var dtKop = new Array();\n";
-                                                    foreach ($koperasi->result() as $kop) {
-                                                        $select = '';
-                                                        if ($row->cif_induk == $kop->cif_induk) $select = 'selected';
-                                                        echo "<option value='" . $kop->nama_kop . "' " . $select . ">" . $kop->nama_kop . "</option>";
-                                                        $jsArray .= "dtKop['" . $kop->nama_kop . "'] = {cif:'" . addslashes($kop->cif_induk) . "', rek:'" . addslashes($kop->rek_agent) . "'};\n";
-                                                    } ?>
+                                                foreach ($koperasi->result() as $kop) {
+                                                    $select = '';
+                                                    if ($row->cif_induk == $kop->cif_induk) $select = 'selected';
+                                                    echo "<option value='" . $kop->nama_kop . "' " . $select . ">" . $kop->nama_kop . "</option>";
+                                                    $jsArray .= "dtKop['" . $kop->nama_kop . "'] = {cif:'" . addslashes($kop->cif_induk) . "', rek:'" . addslashes($kop->rek_agent) . "'};\n";
+                                                } ?>
                                             </select>
                                         </div>
                                     </div>
@@ -94,19 +94,21 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="control-label col-md-4">Rekening Debet Angsuran</label>
+                                        <label class="control-label col-md-4">Rekening Debet Angsuran
+                                            <i class="fa fa-fw fa-question-circle" style="color: #337ab7" data-toggle="tooltip" title="Rek. Agent / Rek. Escrow / Rek. Nasabah"></i>
+                                        </label>
                                         <div class="col-md-4">
-                                            <input type="text" name="rek_pokok" id="rek_pokok" class="form-control" value="<?= $row->rek_pokok ?>" readonly>
+                                            <input type="text" name="rek_pokok" id="rek_pokok" class="form-control" value="<?= $row->rek_pokok ?>">
                                             <?php $check = '';
-                                                if ($row->check == 'Y') $check = 'checked';
-                                                echo "<input type='checkbox' name='checkbox' id='checkbox' " . $check . " value='Y' onclick='toggleCheckbox()'><i class='text-muted'> Rekening Nasabah</i>";
-                                                ?>
+                                            if ($row->check == 'Y') $check = 'checked';
+                                            echo "<input type='checkbox' name='checkbox' id='checkbox' " . $check . " value='Y' onclick='toggleCheckbox()'><i class='text-muted'> Rekening Nasabah</i>";
+                                            ?>
                                         </div>
                                         <?php if ($row->check == 'Y') {
-                                                echo "<h5><i class='text-muted'>" . $row->nama_nsbh . "</i></h5>";
-                                            } else {
-                                                echo "<h5><i class='text-muted'>" . $row->nama_kop . "</i></h5>";
-                                            } ?>
+                                            echo "<h5><i class='text-muted'>" . $row->nama_nsbh . "</i></h5>";
+                                        } else {
+                                            echo "<h5><i class='text-muted'>" . $row->nama_kop . "</i></h5>";
+                                        } ?>
                                     </div>
                                 </div>
                             </div>
@@ -118,11 +120,11 @@
                                         <div class="col-md-8">
                                             <select name="kd_cabang" id="kd_cabang" class="form-control selectpicker" data-live-search="true">
                                                 <?php $cabang = $this->db->get('tbl_cabang');
-                                                    foreach ($cabang->result_array() as $cab) {
-                                                        $select = '';
-                                                        if ($cab['kd_cabang'] == $row->kode_cabang) $select = 'selected';
-                                                        echo "<option value='" . $cab['kd_cabang'] . "' " . $select . ">" . $cab['nama_cabang'] . "</option>";
-                                                    } ?>
+                                                foreach ($cabang->result_array() as $cab) {
+                                                    $select = '';
+                                                    if ($cab['kd_cabang'] == $row->kode_cabang) $select = 'selected';
+                                                    echo "<option value='" . $cab['kd_cabang'] . "' " . $select . ">" . $cab['nama_cabang'] . "</option>";
+                                                } ?>
                                             </select>
                                         </div>
                                     </div>
@@ -134,10 +136,10 @@
                                             <select class="form-control selectpicker" name="lokasi" data-live-search="true">
                                                 <?php $lokasi = $this->db->get('tbl_lokasi');
                                                 foreach ($lokasi->result_array() as $lok) {
-                                                        $select = '';
-                                                        if ($lok['id'] == $row->lokasi_proyek) $select = 'selected';
-                                                        echo "<option value='" . $lok['id'] . "' " . $select . ">" . $lok['id'] . " - " . $lok['deskripsi'] . "</option>";
-                                                    } ?>
+                                                    $select = '';
+                                                    if ($lok['id'] == $row->lokasi_proyek) $select = 'selected';
+                                                    echo "<option value='" . $lok['id'] . "' " . $select . ">" . $lok['id'] . " - " . $lok['deskripsi'] . "</option>";
+                                                } ?>
                                             </select>
                                         </div>
                                     </div>
@@ -194,13 +196,18 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label col-md-4">Tanggal Pencairan (5)</label>
+                                        <?php $readonly = "readonly";
+                                        $status = $this->db->get_where('tbl_input', ['no_fos' => $row->no_fos, 'tgl_cair !=' => '0000-00-00']);
+                                        if ($status->num_rows() > 0 && $this->session->userdata('akses_user') == 'Reviewer') {
+                                            $readonly = "";
+                                        } ?>
                                         <div class="col-md-5">
                                             <div class="datepicker-center">
                                                 <div class="input-group date">
                                                     <div class="input-group-addon">
                                                         <i class="glyphicon glyphicon-calendar"></i>
                                                     </div>
-                                                    <input type="text" name="tgl_cair" class="form-control" placeholder="yyyy-mm-dd" value="<?= $row->tgl_cair == '0000-00-00' ? '' : $row->tgl_cair ?>" readonly>
+                                                    <input type="text" name="tgl_cair" class="form-control" placeholder="yyyy-mm-dd" value="<?= $row->tgl_cair == '0000-00-00' ? '' : $row->tgl_cair ?>" <?= $readonly ?>>
                                                 </div>
                                             </div>
                                         </div>
@@ -409,6 +416,11 @@
 <?php $this->load->view('layout/_footer'); ?>
 
 <script type="text/javascript">
+    $(document).ready(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+        $('.selectpicker').selectpicker('refresh');
+    });
+
     var rek = document.getElementById('rek_pokok');
     var rek_nsbh = document.getElementById('rek_nsbh');
     var nama_nsbh = document.getElementById('nama_nsbh');
