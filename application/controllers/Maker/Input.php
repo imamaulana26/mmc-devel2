@@ -82,7 +82,7 @@ class Input extends CI_Controller
 			// 'kode' => 1,
 			'nip_member_kop' => input($this->input->post('nip')),
 			'cif' => input($this->input->post('cif')),
-			'cif_induk' => input($this->input->post('cif_induk')),
+			'cif_induk' => input($this->input->post('uniqid')),
 			'nama_nsbh' => input($this->input->post('nama_nsbh')),
 			'nama_kop' => input($this->input->post('nama_kop')),
 			'kode_cabang' => trim($this->input->post('kd_cabang')),

@@ -50,6 +50,7 @@
                                         <label class="control-label col-md-4">CIF Induk</label>
                                         <div class="col-md-4">
                                             <input type="text" name="cif_induk" id="cif_induk" class="form-control" value="<?= $row->cif_induk ?>" readonly>
+                                            <input type="hidden" name="uniqid" id="uniqid" class="form-control" value="<?= $row->uniqid ?>" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -75,7 +76,7 @@
                                                     $select = '';
                                                     if ($row->cif_induk == $kop->cif_induk) $select = 'selected';
                                                     echo "<option value='" . $kop->nama_kop . "' " . $select . ">" . $kop->nama_kop . "</option>";
-                                                    $jsArray .= "dtKop['" . $kop->nama_kop . "'] = {cif:'" . addslashes($kop->cif_induk) . "', rek:'" . addslashes($kop->rek_agent) . "'};\n";
+                                                    $jsArray .= "dtKop['" . $kop->nama_kop . "'] = {uniqid:'" . addslashes($kop->uniqid) . "', cif:'" . addslashes($kop->cif_induk) . "', rek:'" . addslashes($kop->rek_agent) . "'};\n";
                                                 } ?>
                                             </select>
                                         </div>
@@ -430,6 +431,7 @@
     function changeValue(nama_kop) {
         document.getElementById('cif_induk').value = dtKop[nama_kop].cif;
         document.getElementById('rek_pokok').value = dtKop[nama_kop].rek;
+        document.getElementById('uniqid').value = dtKop[nama_kop].uniqid;
         $('h5').html("<i class='text-muted'>" + $('#nama_kop').val() + "</i>");
         document.getElementById("checkbox").checked = false;
         $('#formValid').bootstrapValidator('updateStatus', 'rek_pokok', 'NOT_VALIDATED');

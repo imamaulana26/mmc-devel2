@@ -47,6 +47,7 @@
                                     <label class="control-label col-md-4">CIF Induk</label>
                                     <div class="col-md-4">
                                         <input type="text" name="cif_induk" id="cif_induk" class="form-control" readonly>
+                                        <input type="hidden" name="uniqid" id="uniqid" class="form-control" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -70,7 +71,7 @@
                                             <?php $jsArray = "var dtKop = new Array();\n";
                                             foreach ($koperasi->result() as $kop) {
                                                 echo "<option value='" . $kop->nama_kop . "'>" . $kop->nama_kop . "</option>";
-                                                $jsArray .= "dtKop['" . $kop->nama_kop . "'] = {cif:'" . addslashes($kop->cif_induk) . "', rek:'" . addslashes($kop->rek_agent) . "'};\n";
+                                                $jsArray .= "dtKop['" . $kop->nama_kop . "'] = {uniqid:'" . addslashes($kop->uniqid) . "', cif:'" . addslashes($kop->cif_induk) . "', rek:'" . addslashes($kop->rek_agent) . "'};\n";
                                             } ?>
                                         </select>
                                     </div>
@@ -89,7 +90,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="control-label col-md-4">Rekening Debet Angsuran 
+                                    <label class="control-label col-md-4">Rekening Debet Angsuran
                                         <i class="fa fa-fw fa-question-circle" style="color: #337ab7" data-toggle="tooltip" title="Rek. Agent / Rek. Escrow / Rek. Nasabah"></i>
                                     </label>
                                     <div class="col-md-4">
@@ -401,7 +402,7 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $('[data-toggle="tooltip"]').tooltip(); 
+        $('[data-toggle="tooltip"]').tooltip();
         $('.selectpicker').selectpicker('refresh');
     });
 
@@ -414,6 +415,7 @@
     function changeValue(nama_kop) {
         document.getElementById('cif_induk').value = dtKop[nama_kop].cif;
         document.getElementById('rek_pokok').value = dtKop[nama_kop].rek;
+        document.getElementById('uniqid').value = dtKop[nama_kop].uniqid;
         $('h5').html("<i class='text-muted'>" + $('#nama_kop').val() + "</i>");
         document.getElementById("checkbox").checked = false;
         $('#formValid').bootstrapValidator('updateStatus', 'rek_pokok', 'NOT_VALIDATED');
