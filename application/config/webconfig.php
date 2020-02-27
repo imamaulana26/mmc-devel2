@@ -1,5 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
+// file pto
+$config['file_pto'] = 'assets/PTO_MMC_DONE_190219.pdf';
+
 // Config database
 $config['hostname'] = 'devel2.bsm.co.id'; // devel2.bsm.co.id
 $config['username'] = 'bbg'; // bbg

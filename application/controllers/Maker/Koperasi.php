@@ -53,7 +53,6 @@ class Koperasi extends CI_Controller
 
 	function simpan()
 	{
-		$key = uniqid();
 		$method = input($this->input->post('method'));
 		$akses = $this->session->userdata('akses_user');
 
@@ -65,7 +64,7 @@ class Koperasi extends CI_Controller
 		}
 
 		$data = array(
-			'uniqid' => $key,
+			// 'uniqid' => $key,
 			'cif_induk' => input($this->input->post('cif_induk')),
 			'nip_user' => $this->session->userdata('nip'),
 			// 'cabang' => $this->session->userdata('cabang'),
@@ -91,29 +90,31 @@ class Koperasi extends CI_Controller
 			'waktu' => date('Y-m-d H:i:s')
 		);
 
-		$qry = $this->m_koperasi->getData($key);
-
 		if ($method == 'add') {
-			if ($qry->num_rows() > 0) {
-				$this->session->set_flashdata('Error', 'Data koperasi ' . $data['cif_induk'] . ' telah tersedia!');
-				$this->index();
-			} else {
-				$data['cabang'] = $this->session->userdata('cabang');
-				$log['detail'] = "data koperasi " . $data['cif_induk'] . " - " . $data['nama_kop'] . " berhasil disimpan!";
+			$data['uniqid'] = uniqid();
+			$data['cabang'] = $this->session->userdata('cabang');
+			$log['detail'] = "data koperasi " . $data['cif_induk'] . " - " . $data['nama_kop'] . " berhasil disimpan!";
 
-				$this->m_koperasi->insertData($data);
-				$this->m_log->insert($log);
-				$this->session->set_flashdata('Info', 'Data koperasi ' . $data['cif_induk'] . ' - ' . $data['nama_kop'] . ' berhasil disimpan!');
+			$this->m_koperasi->insertData($data);
+			$this->m_log->insert($log);
+			$this->session->set_flashdata('Info', 'Data koperasi ' . $data['cif_induk'] . ' - ' . $data['nama_kop'] . ' berhasil disimpan!');
 
-				$this->index();
-			}
+			$this->index();
 		} else {
 			$lngp = input($this->input->post('id_fasilitas'));
+			$key = input($this->input->post('uniqid'));
+
 			if ($akses == 'Reviewer') {
-				if (is_numeric($lngp)) {
-					$data['id_fasilitas'] = 'LNGP' . $lngp;
+				if ($lngp != '') {
+					if (is_numeric($lngp)) {
+						$data['id_fasilitas'] = 'LNGP' . $lngp;
+					} else {
+						$this->session->set_flashdata('Error', 'Kode koperasi ' . $data['nama_kop'] . ' tidak valid');
+						$this->index();
+						return;
+					}
 				} else {
-					$this->session->set_flashdata('Error', 'Kode koperasi ' . $data['nama_kop'] . ' tidak valid');
+					$this->session->set_flashdata('Error', 'Kode koperasi ' . $data['nama_kop'] . ' belum terisi');
 					$this->index();
 					return;
 				}
@@ -121,7 +122,7 @@ class Koperasi extends CI_Controller
 
 			$get_data = $this->db->get_where('tbl_koperasi', ['uniqid' => $key])->row_array();
 			if ($get_data['nominal'] < str_replace(',', '', $this->input->post('sisa_nom'))) {
-				$this->session->set_flashdata('Error', $data['nama_kop'] . ' - Nominal tersedia tidak boleh melebihi nominal awal!');
+				$this->session->set_flashdata('Error', $get_data['nama_kop'] . ' - Nominal tersedia tidak boleh melebihi nominal awal!');
 				$this->index();
 				return;
 			}

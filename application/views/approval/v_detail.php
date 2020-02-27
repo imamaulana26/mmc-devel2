@@ -32,7 +32,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title" id="myModalLabel">Reviewer FOG</h4>
+                        <h4 class="modal-title" id="myModalLabel">Input Tanggal Pencairan</h4>
                     </div>
                     <div class="modal-body">
                         <div class="row">
