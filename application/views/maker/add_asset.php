@@ -15,7 +15,7 @@
 						<div class="panel-body">
 							<input type="hidden" name="nip" value="<?= $row->nip_member_kop ?>">
 							<input type="hidden" name="no_fos" value="<?= $row->no_fos ?>">
-							<input type="hidden" id="cif" value="<?= $row->cif_induk ?>">
+							<input type="hidden" id="cif" value="<?= $row->cif_pemasok ?>">
 							<input type="hidden" id="rek" value="<?= $row->rek_nsbh ?>">
 							<input type="hidden" id="kop" value="<?= $row->nama_kop ?>">
 							<input type="hidden" id="nama" value="<?= $row->nama_nsbh ?>">
