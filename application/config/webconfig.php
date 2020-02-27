@@ -10,8 +10,8 @@ $config['password'] = 'BBG1234'; // BBG1234
 $config['database'] = 'bbg'; // bbg
 
 // Login
-$config['login'] = 'login/auth'; // login/ldap
-// $config['login'] = 'login/ldap'; // login/auth
+// $config['login'] = 'login/auth'; // login/ldap
+$config['login'] = 'login/ldap'; // login/auth
 
 // Config send mail
 $config['protocol'] = 'mail';
