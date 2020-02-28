@@ -112,6 +112,12 @@ class Cabang extends CI_Controller
         echo "<script type='text/javascript'>alert('Data region " . $get_ro['nm_region'] . " berhasil terhapus');";
         echo "window.location.href='" . site_url(ucfirst('admin/cabang')) . "';</script>";
     }
+
+    public function get_area($ro){
+        $data = $this->db->get_where('tbl_area', ['nm_region' => str_replace('%20', ' ', $ro)])->result_array();
+        echo json_encode($data);
+        exit();
+    }
     // management region
 
     // management area
@@ -277,7 +283,7 @@ class Cabang extends CI_Controller
                 $data['inputerror'][] = 'kd_cabang';
                 $data['error'][] = 'Kode cabang harus diisi';
                 $data['status'] = false;
-            } else if (!preg_match('/^[0-9]?$/', $this->input->post('kd_cabang'))) {
+            } else if (!preg_match('/^[0-9]+$/', $this->input->post('kd_cabang'))) {
                 $data['inputerror'][] = 'kd_cabang';
                 $data['error'][] = 'Kode cabang tidak valid';
                 $data['status'] = false;
@@ -315,7 +321,7 @@ class Cabang extends CI_Controller
             $batch[] = array(
                 'kd_cabang' => 'ID' . $_POST['kd_cabang'][$i],
                 'nama_cabang' => strtoupper($_POST['nm_cabang'][$i]),
-                'area' => 'ID' . $this->input->post('area') . 'a',
+                'area' => $this->input->post('area'),
                 'region' => $this->input->post('region')
             );
         }
@@ -331,7 +337,7 @@ class Cabang extends CI_Controller
         $id = 'ID' . $this->input->post('kd_cabang');
         $data = array(
             'region' => $this->input->post('region'),
-            'area' => 'ID' . $this->input->post('area') . 'a',
+            'area' => $this->input->post('area'),
             'nama_cabang' => strtoupper($this->input->post('nm_cabang'))
         );
 
@@ -348,61 +354,4 @@ class Cabang extends CI_Controller
         echo "window.location.href='" . site_url(ucfirst('admin/cabang')) . "';</script>";
     }
     // management cabang
-
-    // function get_cabang()
-    // {
-    //     $data = $this->db->get('tbl_cabang')->result_array();
-    //     echo json_encode($data);
-    //     exit;
-    // }
-
-    // function add_cabang()
-    // {
-    //     $isi = array(
-    //         'konten' => 'admin/add_cabang'
-    //     );
-
-    //     ob_start('ob_gzhandler');
-    //     $this->load->view('layout/_header');
-    //     $this->load->view('layout/_content', $isi);
-    // }
-
-    // function edit_cabang($id)
-    // {
-    //     $isi = array(
-    //         'konten' => 'admin/edit_cabang',
-    //         'data' => $this->m_cabang->getData($id)
-    //     );
-
-    //     ob_start('ob_gzhandler');
-    //     $this->load->view('layout/_header');
-    //     $this->load->view('layout/_content', $isi);
-    // }
-
-    // function save()
-    // {
-    //     $id = $this->input->post('id');
-    //     $method = $this->input->post('method');
-
-    //     $data = array(
-    //         'kd_cabang' => 'ID' . $this->input->post('kd_cabang'),
-    //         'nama_cabang' => $this->input->post('nama_cabang'),
-    //         'area' => $this->input->post('area'),
-    //         'region' => $this->input->post('region')
-    //     );
-
-    //     if ($method == 'add') {
-    //         $qry = $this->db->get_where('tbl_cabang', ['kd_cabang' => $data['kd_cabang']]);
-    //         if ($qry->num_rows() > 0) {
-    //             $this->session->set_flashdata('Error', "Data cabang <b>" . $data['kd_cabang'] . "</b> sudah tersedia!");
-    //         } else {
-    //             $this->db->insert('tbl_cabang', $data);
-    //             $this->session->set_flashdata('Info', "Data cabang <b>" . $data['kd_cabang'] . " - " . $data['nama_cabang'] . "</b> berhasil disimpan!");
-    //         }
-    //     } else {
-    //         $this->db->update('tbl_cabang', $data, ['id' => $id]);
-    //         $this->session->set_flashdata('Info', "Data cabang <b>" . $data['kd_cabang'] . " - " . $data['nama_cabang'] . "</b> berhasil diubah!");
-    //     }
-    //     redirect(ucfirst('admin/cabang'));
-    // }
 }

@@ -95,17 +95,18 @@
                         </thead>
                         <tbody>
                             <?php $no = 1;
-                            $cabang = $this->db->get('tbl_cabang')->result_array();
+                            $this->db->select('*')->from('tbl_cabang a')->join('tbl_area b', 'a.area = b.kd_area', 'inner')->order_by('a.region');
+                            $cabang = $this->db->get()->result_array();
                             foreach ($cabang as $cab) { ?>
                                 <tr>
                                     <td><?= $no++ ?></td>
                                     <td><?= cetak($cab['kd_cabang']) ?></td>
                                     <td><?= cetak($cab['nama_cabang']) ?></td>
-                                    <td><?= cetak($cab['area']) ?></td>
+                                    <td><?= cetak($cab['nm_area']) ?></td>
                                     <td><?= cetak($cab['region']) ?></td>
                                     <td class="text-center">
                                         <a href="javascript:void(0)" onclick="edit_cabang('<?= $cab['kd_cabang'] ?>')"><i class="fa fa-fw fa-edit"></i></a>
-                                        <a href="javascript:void(0)" onclick="delete_cabang('<?= $cab['kd_cabang'] ?>')"><i class="fa fa-fw fa-trash"></i></a>
+                                        <a href="<?= site_url(ucfirst('admin/cabang/delete_cabang/' . $cab['kd_cabang'])) ?>" onclick="return confirm('Apakah anda yakin akan menghapus data <?= $cab['nama_cabang'] ?>?');"><i class="fa fa-fw fa-trash"></i></a>
                                     </td>
                                 </tr>
                             <?php } ?>

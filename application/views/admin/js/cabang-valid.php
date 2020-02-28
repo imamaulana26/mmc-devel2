@@ -366,6 +366,7 @@
 
     function edit_cabang(id) {
         save_method = 'update';
+        list_area();
         $('#form_office_edit')[0].reset();
         $('#title_office_edit').text('Ubah Daftar Cabang');
 
