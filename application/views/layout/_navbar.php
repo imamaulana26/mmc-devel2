@@ -33,8 +33,8 @@
                 <li><a href="<?= site_url(ucfirst('admin/dashboard')) ?>"><i class="fa fa-desktop fa-fw"></i> Dashboard</a></li>
                 <li><a href="#"><i class="fa fa-database fa-fw"></i> Input Data<sapn class="fa arrow"></sapn></a>
                     <ul class="nav nav-second-level">
-                        <li><a href="<?= site_url(ucfirst('admin/user')) ?>"><i class="fa fa-users fa-fw"></i> Daftar Users</a></li>
-                        <li><a href="<?= site_url(ucfirst('admin/cabang')) ?>"><i class="fa fa-building fa-fw"></i> Daftar Cabang</a></li>
+                        <li><a href="<?= site_url(ucfirst('admin/user')) ?>"><i class="fa fa-users fa-fw"></i> Management Users</a></li>
+                        <li><a href="<?= site_url(ucfirst('admin/cabang')) ?>"><i class="fa fa-building fa-fw"></i> Management Cabang</a></li>
                     </ul>
                 </li>
                 <li><a href="<?= site_url(ucfirst('admin/user/log')) ?>"><i class="fa fa-history fa-fw"></i> Daftar Log History</a></li>
