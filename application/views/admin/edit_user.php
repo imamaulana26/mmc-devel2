@@ -177,7 +177,7 @@
                 arr = ['FO Staff', 'BFO Staff', 'CV Staff', 'FCLA', 'FO Supervisor', 'LPDC Officer', 'LPDC Sign Officer', 'LPDC Staff', 'LPDC Supervisor'];
                 get_cabang_fog();
             } else {
-                arr = ['AFO Manager', 'BFO Supervisor', 'CV Officer', 'LPDC Manager'];
+                arr = ['FO Supervisor', 'AFO Manager', 'BFO Supervisor', 'CV Officer', 'LPDC Manager'];
                 get_cabang_fog();
             }
 
