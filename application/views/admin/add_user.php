@@ -59,7 +59,7 @@
                     <div class="col-md-3">
                         <select class="form-control selectpicker" name="akses" id="akses">
                             <option value="" selected disabled>-- Please Select --</option>
-                            <?php $list = array('Admin', 'Maker', 'Checker', 'Reviewer', 'Approval');
+                            <?php $list = array('Maker', 'Checker', 'Reviewer', 'Approval');
                             foreach ($list as $li) {
                                 echo "<option value='" . $li . "'>" . $li . "</option>";
                             } ?>
@@ -114,29 +114,42 @@
 
 <script>
     $(document).ready(function() {
-        get_cabang();
-
         $('#toggle_jaringan').hide();
         $('#akses').change(function() {
-            if ($(this).val() != 'Admin' && $(this).val() != 'Maker') {
+            if ($(this).val() != 'Maker') {
                 $('#toggle_jaringan').show();
+                $.ajax({
+                    url: '<?= site_url(ucfirst('admin/cabang/get_cabang')) ?>',
+                    type: 'GET',
+                    dataType: 'JSON',
+                    success: function(data) {
+                        var html = '';
+                        for (var i = 0; i < data.length; i++) {
+                            html += '<option value="' + data[i].kd_cabang + '">' + data[i].nama_cabang + '</option>';
+                            $('#jaringan').html(html);
+                        }
+                        $('.selectpicker').selectpicker('refresh');
+                    }
+                });
             } else {
                 $('#toggle_jaringan').hide();
             }
 
             if ($(this).val() == 'Maker') {
                 arr = ['BBRM', 'Jr. BBRM'];
+                get_cabang();
             } else if ($(this).val() == 'Checker') {
                 arr = ['ABBM', 'AM', 'BM'];
+                get_cabang();
             } else if ($(this).val() == 'Reviewer') {
-                arr = ['AFO', 'BFO Staff', 'CV Staff', 'FCLA', 'FO Supervisor', 'LPDC Officer', 'LPDC Sign Officer', 'LPDC Staff', 'LPDC Supervisor'];
-            } else if ($(this).val() == 'Approval') {
-                arr = ['AFO Manager', 'BFO Supervisor', 'CV Officer', 'LPDC Manager'];
+                arr = ['FO Staff', 'BFO Staff', 'CV Staff', 'FCLA', 'FO Supervisor', 'LPDC Officer', 'LPDC Sign Officer', 'LPDC Staff', 'LPDC Supervisor'];
+                get_cabang_fog();
             } else {
-                arr = ['Admin'];
+                arr = ['AFO Manager', 'BFO Supervisor', 'CV Officer', 'LPDC Manager'];
+                get_cabang_rfo();
             }
 
-            var html = '<option value="" selected disabled>-- Please Select --</option>';
+            var html = '<option selected disabled>-- Please Select --</option>';
             for (var i = 0; i < arr.length; i++) {
                 html += '<option value="' + arr[i] + '">' + arr[i] + '</option>';
             }
@@ -151,9 +164,42 @@
             type: 'GET',
             dataType: 'JSON',
             success: function(data) {
+                var html = '<option selected disabled>-- Please Select --</option>';
                 for (var i = 0; i < data.length; i++) {
-                    $('#cabang').append('<option value="' + data[i].kd_cabang + '">' + data[i].nama_cabang + '</option>');
-                    $('#jaringan').append('<option value="' + data[i].kd_cabang + '">' + data[i].nama_cabang + '</option>');
+                    html += '<option value="' + data[i].kd_cabang + '">' + data[i].nama_cabang + '</option>';
+                    $('#cabang').html(html);
+                }
+                $('.selectpicker').selectpicker('refresh');
+            }
+        });
+    }
+    
+    function get_cabang_fog() {
+        $.ajax({
+            url: '<?= site_url(ucfirst('admin/cabang/get_cabang_fog')) ?>',
+            type: 'GET',
+            dataType: 'JSON',
+            success: function(data) {
+                var html = '<option selected disabled>-- Please Select --</option>';
+                for (var i = 0; i < data.length; i++) {
+                    html += '<option value="' + data[i].kd_cabang + '">' + data[i].nama_cabang + '</option>';
+                    $('#cabang').html(html);
+                }
+                $('.selectpicker').selectpicker('refresh');
+            }
+        });
+    }
+    
+    function get_cabang_rfo() {
+        $.ajax({
+            url: '<?= site_url(ucfirst('admin/cabang/get_cabang_rfo')) ?>',
+            type: 'GET',
+            dataType: 'JSON',
+            success: function(data) {
+                var html = '<option selected disabled>-- Please Select --</option>';
+                for (var i = 0; i < data.length; i++) {
+                    html += '<option value="' + data[i].kd_cabang + '">' + data[i].nama_cabang + '</option>';
+                    $('#cabang').html(html);
                 }
                 $('.selectpicker').selectpicker('refresh');
             }

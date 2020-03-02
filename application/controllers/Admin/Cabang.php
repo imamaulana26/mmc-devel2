@@ -354,4 +354,28 @@ class Cabang extends CI_Controller
         echo "window.location.href='" . site_url(ucfirst('admin/cabang')) . "';</script>";
     }
     // management cabang
+
+    public function get_cabang()
+    {
+        $qry = "select * from tbl_cabang where nama_cabang like 'KC%' or nama_cabang like 'KCP%'";
+        $data = $this->db->query($qry)->result_array();
+        echo json_encode($data);
+        exit();
+    }
+    
+    public function get_cabang_fog()
+    {
+        $qry = "select * from tbl_cabang where nama_cabang not like 'KC%' and nama_cabang not like 'KCP%'";
+        $data = $this->db->query($qry)->result_array();
+        echo json_encode($data);
+        exit();
+    }
+
+    public function get_cabang_rfo()
+    {
+        $qry = "select * from tbl_cabang where nama_cabang not like 'KC%' and nama_cabang not like 'KCP%' and nama_cabang not like 'BFO%'";
+        $data = $this->db->query($qry)->result_array();
+        echo json_encode($data);
+        exit();
+    }
 }

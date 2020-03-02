@@ -61,12 +61,12 @@
                         <div class="col-md-3">
                             <select class="form-control selectpicker" name="akses" id="akses">
                                 <option value="" selected disabled>-- Please Select --</option>
-                                <?php $list = array('Admin', 'Maker', 'Checker', 'Reviewer', 'Approval');
-                                    foreach ($list as $li) {
-                                        $select = '';
-                                        if ($dt['akses_user'] == $li) $select = 'selected';
-                                        echo "<option value='" . $li . "' " . $select . ">" . $li . "</option>";
-                                    } ?>
+                                <?php $list = array('Maker', 'Checker', 'Reviewer', 'Approval');
+                                foreach ($list as $li) {
+                                    $select = '';
+                                    if ($dt['akses_user'] == $li) $select = 'selected';
+                                    echo "<option value='" . $li . "' " . $select . ">" . $li . "</option>";
+                                } ?>
                             </select>
                         </div>
                     </div>
@@ -85,11 +85,19 @@
                         <div class="col-md-5">
                             <select class="form-control selectpicker" name="cabang" id="cabang" data-live-search="true">
                                 <option value="" selected disabled>-- Please Select --</option>
-                                <?php foreach ($cabang as $cab) {
-                                        $select = '';
-                                        if ($dt['cabang'] == $cab['kd_cabang']) $select = 'selected';
-                                        echo "<option value='" . $cab['kd_cabang'] . "' " . $select . ">" . $cab['nama_cabang'] . "</option>";
-                                    } ?>
+                                <?php if ($dt['akses_user'] == 'Maker' || $dt['akses_user'] == 'Checker') {
+                                    $qry = "select * from tbl_cabang where nama_cabang like 'KC%' or nama_cabang like 'KCP%'";
+                                } else if ($dt['akses_user'] == 'Reviewer') {
+                                    $qry = "select * from tbl_cabang where nama_cabang not like 'KC%' and nama_cabang not like 'KCP%'";
+                                } else {
+                                    $qry = "select * from tbl_cabang where nama_cabang not like 'KC%' and nama_cabang not like 'KCP%' and nama_cabang not like 'BFO%'";
+                                }
+                                $cabang = $this->db->query($qry)->result_array();
+                                foreach ($cabang as $cab) {
+                                    $select = '';
+                                    if ($dt['cabang'] == $cab['kd_cabang']) $select = 'selected';
+                                    echo "<option value='" . $cab['kd_cabang'] . "' " . $select . ">" . $cab['nama_cabang'] . "</option>";
+                                } ?>
                             </select>
                         </div>
                     </div>
@@ -100,15 +108,17 @@
                             <select class="form-control selectpicker" name="jaringan[]" id="jaringan" multiple data-live-search="true">
                                 <option value="" disabled>-- Please Select --</option>
                                 <?php if ($dt['akses_user'] != 'Maker') {
-                                        foreach ($cabang as $cab) {
-                                            $select = '';
-                                            $exp = explode("::", $dt['jaringan']);
-                                            for ($i = 0; $i < count($exp); $i++) {
-                                                if ($exp[$i] == $cab['kd_cabang']) $select = 'selected';
-                                            }
-                                            echo "<option value='" . $cab['kd_cabang'] . "' " . $select . ">" . $cab['nama_cabang'] . "</option>";
+                                    $qry = "select * from tbl_cabang where nama_cabang like 'KC%' or nama_cabang like 'KCP%'";
+                                    $cabang = $this->db->query($qry)->result_array();
+                                    foreach ($cabang as $cab) {
+                                        $select = '';
+                                        $exp = explode("::", $dt['jaringan']);
+                                        for ($i = 0; $i < count($exp); $i++) {
+                                            if ($exp[$i] == $cab['kd_cabang']) $select = 'selected';
                                         }
-                                    } ?>
+                                        echo "<option value='" . $cab['kd_cabang'] . "' " . $select . ">" . $cab['nama_cabang'] . "</option>";
+                                    }
+                                } ?>
                             </select>
                         </div>
                     </div>
@@ -131,29 +141,44 @@
     $(document).ready(function() {
         $('#toggle_jaringan').hide();
 
-        if ($('#akses').val() != 'Admin' && $('#akses').val() != 'Maker') {
+        if ($('#akses').val() != 'Maker') {
             $('#toggle_jaringan').show();
         } else {
             $('#toggle_jaringan').hide();
         }
 
         $('#akses').change(function() {
-            if ($(this).val() != 'Admin' && $(this).val() != 'Maker') {
+            if ($(this).val() != 'Maker') {
                 $('#toggle_jaringan').show();
+                $.ajax({
+                    url: '<?= site_url(ucfirst('admin/cabang/get_cabang')) ?>',
+                    type: 'GET',
+                    dataType: 'JSON',
+                    success: function(data) {
+                        var html = '';
+                        for (var i = 0; i < data.length; i++) {
+                            html += '<option value="' + data[i].kd_cabang + '">' + data[i].nama_cabang + '</option>';
+                            $('#jaringan').html(html);
+                        }
+                        $('.selectpicker').selectpicker('refresh');
+                    }
+                });
             } else {
                 $('#toggle_jaringan').hide();
             }
 
             if ($(this).val() == 'Maker') {
                 arr = ['BBRM', 'Jr. BBRM'];
+                get_cabang();
             } else if ($(this).val() == 'Checker') {
                 arr = ['ABBM', 'AM', 'BM'];
+                get_cabang();
             } else if ($(this).val() == 'Reviewer') {
-                arr = ['AFO', 'BFO Staff', 'CV Staff', 'FCLA', 'FO Supervisor', 'LPDC Officer', 'LPDC Sign Officer', 'LPDC Staff', 'LPDC Supervisor'];
-            } else if ($(this).val() == 'Approval') {
-                arr = ['AFO Manager', 'BFO Supervisor', 'CV Officer', 'LPDC Manager'];
+                arr = ['FO Staff', 'BFO Staff', 'CV Staff', 'FCLA', 'FO Supervisor', 'LPDC Officer', 'LPDC Sign Officer', 'LPDC Staff', 'LPDC Supervisor'];
+                get_cabang_fog();
             } else {
-                arr = ['Admin'];
+                arr = ['AFO Manager', 'BFO Supervisor', 'CV Officer', 'LPDC Manager'];
+                get_cabang_fog();
             }
 
             var html = '<option value="" selected disabled>-- Please Select --</option>';
@@ -164,4 +189,52 @@
             $('.selectpicker').selectpicker('refresh');
         });
     });
+
+    function get_cabang() {
+        $.ajax({
+            url: '<?= site_url(ucfirst('admin/cabang/get_cabang')) ?>',
+            type: 'GET',
+            dataType: 'JSON',
+            success: function(data) {
+                var html = '<option selected disabled>-- Please Select --</option>';
+                for (var i = 0; i < data.length; i++) {
+                    html += '<option value="' + data[i].kd_cabang + '">' + data[i].nama_cabang + '</option>';
+                    $('#cabang').html(html);
+                }
+                $('.selectpicker').selectpicker('refresh');
+            }
+        });
+    }
+
+    function get_cabang_fog() {
+        $.ajax({
+            url: '<?= site_url(ucfirst('admin/cabang/get_cabang_fog')) ?>',
+            type: 'GET',
+            dataType: 'JSON',
+            success: function(data) {
+                var html = '<option selected disabled>-- Please Select --</option>';
+                for (var i = 0; i < data.length; i++) {
+                    html += '<option value="' + data[i].kd_cabang + '">' + data[i].nama_cabang + '</option>';
+                    $('#cabang').html(html);
+                }
+                $('.selectpicker').selectpicker('refresh');
+            }
+        });
+    }
+    
+    function get_cabang_rfo() {
+        $.ajax({
+            url: '<?= site_url(ucfirst('admin/cabang/get_cabang_rfo')) ?>',
+            type: 'GET',
+            dataType: 'JSON',
+            success: function(data) {
+                var html = '<option selected disabled>-- Please Select --</option>';
+                for (var i = 0; i < data.length; i++) {
+                    html += '<option value="' + data[i].kd_cabang + '">' + data[i].nama_cabang + '</option>';
+                    $('#cabang').html(html);
+                }
+                $('.selectpicker').selectpicker('refresh');
+            }
+        });
+    }
 </script>

@@ -42,8 +42,8 @@ class User extends CI_Controller
 	{
 		$isi = array(
 			'konten' => 'admin/edit_user',
-			'data' => $this->m_user->getData($key),
-			'cabang' => $this->m_list->getAllCabang()
+			'data' => $this->m_user->getData($key)
+			// 'cabang' => $this->m_list->getAllCabang()
 		);
 
 		ob_start('ob_gzhandler');
