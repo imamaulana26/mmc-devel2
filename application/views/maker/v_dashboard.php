@@ -133,35 +133,22 @@
                                 <tr>
                                     <td><?= $no++ ?></td>
                                     <td>
-                                        <?php $this->db->select('a.no_fos')->from('tbl_input a');
-                                        $this->db->join('tbl_induk b', 'a.no_fos = b.no_fos', 'inner');
-                                        $this->db->join('tbl_anak c', 'a.no_fos = c.no_fos', 'inner');
-                                        $this->db->join('tbl_link e', 'a.no_fos = e.no_fos', 'inner');
-                                        $this->db->join('tbl_jaminan f', 'a.no_fos = f.no_fos', 'inner');
-                                        $this->db->join('tbl_asset g', 'a.no_fos = g.no_fos', 'inner');
-                                        $this->db->join('tbl_kontrak h', 'a.no_fos = h.no_fos', 'inner');
-                                        $data = $this->db->get();
-
-                                        if ($data->num_rows() == 6) { ?>
-                                            <a href="" data-toggle="modal" data-target="#details<?= $row['no_fos'] ?>" title="Detail"><?= $row['no_fos'] ?></a>
-                                        <?php } else {
-                                            if ($this->db->get_where('tbl_input', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
-                                                echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/input/add_input/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
-                                            } else if ($this->db->get_where('tbl_induk', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
-                                                echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/induk/add_induk/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
-                                            } else if ($this->db->get_where('tbl_anak', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
-                                                echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/anak/add_anak/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
-                                            } else if ($this->db->get_where('tbl_link', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
-                                                echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/link/add_link/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
-                                            } else if ($this->db->get_where('tbl_jaminan', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
-                                                echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/jaminan/add_jaminan/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
-                                            } else if ($this->db->get_where('tbl_asset', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
-                                                echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/asset/add_asset/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
-                                            } else if ($this->db->get_where('tbl_kontrak', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
-                                                echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/kontrak/add_kontrak/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
-                                            }
-                                        }
-                                        ?>
+                                        <?php 
+                                        if ($this->db->get_where('tbl_input', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
+                                            echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/input/add_input/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
+                                        } else if ($this->db->get_where('tbl_induk', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
+                                            echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/induk/add_induk/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
+                                        } else if ($this->db->get_where('tbl_anak', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
+                                            echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/anak/add_anak/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
+                                        } else if ($this->db->get_where('tbl_link', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
+                                            echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/link/add_link/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
+                                        } else if ($this->db->get_where('tbl_jaminan', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
+                                            echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/jaminan/add_jaminan/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
+                                        } else if ($this->db->get_where('tbl_asset', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
+                                            echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/asset/add_asset/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
+                                        } else if ($this->db->get_where('tbl_kontrak', ['no_fos' => $row['no_fos']])->num_rows() < 1) {
+                                            echo "<i class='fa fa-fw fa-bookmark'></i> <a href='" . site_url(ucfirst('maker/kontrak/add_kontrak/' . $row['no_fos'])) . "' title='Detail'>" . $row['no_fos'] . "</a>";
+                                        } ?>
                                     </td>
                                     <td><?= $row['nama_cabang'] ?></td>
                                     <td><?= $row['nama_kop'] ?></td>
