@@ -180,7 +180,7 @@ class Dashboard extends CI_Controller
 		$this->db->join("tbl_link", "tbl_link.no_fos = tbl_input.no_fos", "inner");
 		$this->db->join("tbl_jaminan", "tbl_jaminan.no_fos = tbl_input.no_fos", "inner");
 		$this->db->join("tbl_asset", "tbl_asset.no_fos = tbl_input.no_fos", "inner");
-		$this->db->join("tbl_koperasi", "tbl_koperasi.cif_induk = tbl_input.cif_induk", "inner");
+		$this->db->join("tbl_koperasi", "tbl_koperasi.uniqid = tbl_input.cif_induk", "inner");
 		$this->db->join("tbl_kontrak", "tbl_kontrak.no_fos = tbl_input.no_fos", "inner");
 		$this->db->where("tbl_input.no_fos", $key);
 		$query = $this->db->get();
@@ -373,8 +373,8 @@ class Dashboard extends CI_Controller
 							$msg .= "<i>*) Harap tidak membalas pesan ini.</i>";
 
 							// update sisa nominal pada koperasi
-							$sisa_nom = $this->db->get_where('tbl_koperasi', ['cif_induk' => $dt_mail['cif_induk']])->row_array();
-							$this->db->update('tbl_koperasi', ['sisa_nom' => $sisa_nom['sisa_nom'] - $dt_mail['nom_fasilitas']], ['cif_induk' => $dt_mail['cif_induk']]);
+							$sisa_nom = $this->db->get_where('tbl_koperasi', ['uniqid' => $dt_mail['cif_induk']])->row_array();
+							$this->db->update('tbl_koperasi', ['sisa_nom' => $sisa_nom['sisa_nom'] - $dt_mail['nom_fasilitas']], ['uniqid' => $dt_mail['cif_induk']]);
 
 							// kirim email ke user maker, checker, reviewer, approval
 							$this->db->select('*')->from('tbl_input')->where('no_fos', $data['no_fos']);
