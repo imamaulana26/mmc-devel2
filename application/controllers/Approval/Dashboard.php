@@ -531,7 +531,7 @@ class Dashboard extends CI_Controller
 		$this->db->join('tbl_link d', 'd.no_fos = a.no_fos', 'inner');
 		$this->db->join('tbl_jaminan e', 'e.no_fos = a.no_fos', 'inner');
 		$this->db->join('tbl_asset f', 'f.no_fos = a.no_fos', 'inner');
-		$this->db->join('tbl_koperasi g', 'g.cif_induk = a.cif_induk', 'inner');
+		$this->db->join('tbl_koperasi g', 'g.uniqid = a.cif_induk', 'inner');
 		$this->db->join('tbl_kontrak h', 'h.no_fos = a.no_fos', 'inner');
 		$this->db->join('tbl_cabang i', 'i.kd_cabang = a.kode_cabang', 'inner');
 		$this->db->where('a.no_fos', $id);
